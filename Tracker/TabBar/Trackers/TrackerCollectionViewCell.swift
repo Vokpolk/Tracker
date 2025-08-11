@@ -1,8 +1,14 @@
 import UIKit
 
+protocol TrackerCellDelegate: AnyObject {
+    func completeTracker(id: UInt, at indexPAth: IndexPath)
+    func uncompleteTracker(id: UInt, at indexPAth: IndexPath)
+}
+
 final class TrackerCollectionViewCell: UICollectionViewCell {
     
     // MARK: - Public Properties
+    var weekDays: [WeekDay] = []
     
     // MARK: - Private Properties
     private var color = UIColor()
@@ -11,14 +17,15 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     private let emojiLabel = UILabel()
     private let trackerName = UILabel()
     private let daysCount = UILabel()
-    private let button = UIButton()
+    private let button = UIButton(type: .custom)
     
-    private var isPicked: Bool = false
+    private var isCompletedToday: Bool = false
+    private var trackerId: UInt?
+    private var indexPath: IndexPath?
     
     // MARK: - LifeCycles
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
         [
             cardBackground,
             emojiBackground,
@@ -38,12 +45,20 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     }
     
     // MARK: - Public Methods
-    func initProperties(
+    func configure(
+        id: UInt,
         color: UIColor,
         emoji: String,
         tracker: String,
-        days: UInt
+        completedDays: Int,
+        weekDays: [WeekDay],
+        isCompletedToday: Bool,
+        indexPath: IndexPath
     ) {
+        // номер трекера
+        trackerId = id
+        
+        // цвет
         self.color = color
         
         // карточка
@@ -69,8 +84,15 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         // количество дней
         daysCount.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         daysCount.textAlignment = .left
-        daysCount.text = "\(days) дней"
+        let wordDay = pluralizeDays(completedDays)
+        daysCount.text = wordDay
         daysCount.textColor = .black
+        
+        // дни недели
+        self.weekDays = weekDays
+        
+        // завершен ли трекер сегодня
+        self.isCompletedToday = isCompletedToday
         
         // кнопка
         button.addTarget(
@@ -78,12 +100,15 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
             action: #selector(Self.buttonTap),
             for: .touchUpInside
         )
-        let image = UIImage(named: "Plus")
+        let image = isCompletedToday ? UIImage(named: "Done") : UIImage(named: "Plus")
         let coloredImage = image?.withTintColor(color)
         button.setImage(coloredImage, for: .normal)
-        button.tintColor = color
-        button.setTitleColor(color, for: .normal)
+        
+        // номер ячейки в коллекции
+        self.indexPath = indexPath
     }
+    
+    weak var delegate: TrackerCellDelegate?
     
     // MARK: - Private Methods
     private func initConstraints() {
@@ -124,16 +149,33 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     }
     
     private func changeButtonLabel() {
-        isPicked = !isPicked
-        if isPicked {
-            let image = UIImage(named: "Done")
-            let coloredImage = image?.withTintColor(color)
-            button.setImage(coloredImage, for: .normal)
+        guard let trackerId, let indexPath else {
+            assertionFailure("no tracker id")
+            return
+        }
+        if isCompletedToday {
+            delegate?.uncompleteTracker(id: trackerId, at: indexPath)
         } else {
-            let image = UIImage(named: "Plus")
-            let coloredImage = image?.withTintColor(color)
-            button.setImage(coloredImage, for: .normal)
+            delegate?.completeTracker(id: trackerId, at: indexPath)
         }
     }
     
+    private func pluralizeDays(_ day: Int) -> String {
+        let absDay = abs(day)
+        let lastTwo = absDay % 100
+        let lastOne = absDay % 10
+        
+        if lastTwo >= 11 && lastTwo <= 19 {
+            return "\(day) дней"
+        } else {
+            switch lastOne {
+            case 1:
+                return "\(day) день"
+            case 2, 3, 4:
+                return "\(day) дня"
+            default:
+                return "\(day) дней"
+            }
+        }
+    }
 }

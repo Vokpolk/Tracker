@@ -1,13 +1,13 @@
 import UIKit
 
-struct Shedule {
-    var monday: Bool = false
-    var tuesday: Bool = false
-    var wednesday: Bool = false
-    var thursday: Bool = false
-    var friday: Bool = false
-    var saturday: Bool = false
-    var sunday: Bool = false
+enum WeekDay: Int {
+    case sunday = 1
+    case monday = 2
+    case tuesday = 3
+    case wednesday = 4
+    case thursday = 5
+    case friday = 6
+    case saturday = 7
 }
 
 struct Tracker {
@@ -15,5 +15,6 @@ struct Tracker {
     let name: String
     let color: UIColor
     let emoji: String
-    let shedule: Shedule
+    //let shedule: Shedule
+    let weekDays: [WeekDay]
 }

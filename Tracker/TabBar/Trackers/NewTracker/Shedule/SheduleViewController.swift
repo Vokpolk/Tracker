@@ -1,6 +1,6 @@
 import UIKit
 
-struct SwitchItem {
+struct WeekShedule {
     let title: String
     var isOn: Bool
 }
@@ -8,14 +8,14 @@ struct SwitchItem {
 final class SheduleViewController: UIViewController {
     
     // MARK: - Private Properties
-    private var data: [SwitchItem] = [
-        SwitchItem(title: "Понедельник", isOn: false),
-        SwitchItem(title: "Вторник", isOn: false),
-        SwitchItem(title: "Среда", isOn: false),
-        SwitchItem(title: "Четверг", isOn: false),
-        SwitchItem(title: "Пятница", isOn: false),
-        SwitchItem(title: "Суббота", isOn: false),
-        SwitchItem(title: "Воскресенье", isOn: false)
+    private var data: [WeekShedule] = [
+        WeekShedule(title: "Понедельник", isOn: false),
+        WeekShedule(title: "Вторник", isOn: false),
+        WeekShedule(title: "Среда", isOn: false),
+        WeekShedule(title: "Четверг", isOn: false),
+        WeekShedule(title: "Пятница", isOn: false),
+        WeekShedule(title: "Суббота", isOn: false),
+        WeekShedule(title: "Воскресенье", isOn: false)
     ]
     private let cellHeight = 75
     
@@ -112,11 +112,6 @@ final class SheduleViewController: UIViewController {
     
     @objc private func readyButtonTap() {
         print("ready button tapped")
-//        for day in data {
-//            if day.isOn == true {
-//                
-//            }
-//        }
         delegate?.getWeekDays(data)
         dismiss(animated: true)
     }

@@ -1,8 +1,14 @@
 import UIKit
 
 final class NewTrackerViewController: UIViewController {
-    
     // MARK: - Private Properties
+    weak var delegate: TrackersDelegate?
+    // MARK: - Private Properties
+    static var trackerId: UInt = 0
+    private var trackerTitle: String? = nil
+    private var trackerCategory: String? = nil
+    private var trackerWeekShedule: [WeekShedule] = []
+    private var isCreateTrackerEnabled: Bool = false
     private let items = [
         "Категория",
         "Расписание"
@@ -47,6 +53,11 @@ final class NewTrackerViewController: UIViewController {
             self,
             action: #selector(Self.textFieldDidReturn),
             for: .editingDidEndOnExit
+        )
+        enterTrackerName.addTarget(
+            self,
+            action: #selector(Self.textFieldDidReturn),
+            for: .editingDidEnd
         )
         return enterTrackerName
     }()
@@ -147,11 +158,48 @@ final class NewTrackerViewController: UIViewController {
     
     @objc private func cancelButtonTap() {
         print("cancel button tap")
+        trackerTitle = nil
+        trackerCategory = nil
+        trackerWeekShedule.removeAll()
         dismiss(animated: true, completion: nil)
     }
     
     @objc private func createButtonTap() {
         print("create button tap")
+        if isCreateTrackerEnabled {
+            delegate?.createTracker(makeTracker())
+            dismiss(animated: true, completion: nil)
+        }
+    }
+    
+    private func makeTracker() -> Tracker {
+        let monday = trackerWeekShedule[0].isOn ? WeekDay.monday : nil
+        let tuesday = trackerWeekShedule[1].isOn ? WeekDay.tuesday : nil
+        let wednesday = trackerWeekShedule[2].isOn ? WeekDay.wednesday : nil
+        let thursday = trackerWeekShedule[3].isOn ? WeekDay.thursday : nil
+        let friday = trackerWeekShedule[4].isOn ? WeekDay.friday : nil
+        let saturday = trackerWeekShedule[5].isOn ? WeekDay.saturday : nil
+        let sunday = trackerWeekShedule[6].isOn ? WeekDay.sunday : nil
+        let optionalWeekDays: [WeekDay?] = [
+            monday,
+            tuesday,
+            wednesday,
+            thursday,
+            friday,
+            saturday,
+            sunday
+        ]
+        let weekDays = optionalWeekDays.compactMap{
+            $0
+        }
+        NewTrackerViewController.trackerId += 1
+        return Tracker(
+            id: NewTrackerViewController.trackerId,
+            name: trackerTitle!,
+            color: .ypGreen,
+            emoji: "🥸",
+            weekDays: weekDays
+        )
     }
     
     @objc func textFieldDidReturn(_ textField: UITextField) {
@@ -161,6 +209,12 @@ final class NewTrackerViewController: UIViewController {
     private func handleEnterPressed(_ trackerName: String?) {
         guard let trackerName else { return }
         print(trackerName)
+        if !trackerName.isEmpty {
+            trackerTitle = trackerName
+        } else {
+            trackerTitle = nil
+        }
+        checkFieldsToUpdateCreateButton()
     }
     
     private func hideKeyboardEvent() {
@@ -170,6 +224,23 @@ final class NewTrackerViewController: UIViewController {
     }
     @objc func hideKeyboard() {
         view.endEditing(true)
+    }
+    
+    private func checkFieldsToUpdateCreateButton() {
+        var isSheduleEmpty = true
+        for trackerDay in trackerWeekShedule {
+            if trackerDay.isOn == true {
+                isSheduleEmpty = false
+                break
+            }
+        }
+        if trackerCategory == nil || trackerTitle == nil || isSheduleEmpty {
+            createButton.backgroundColor = .ypGray
+            isCreateTrackerEnabled = false
+        } else {
+            createButton.backgroundColor = .ypBlack
+            isCreateTrackerEnabled = true
+        }
     }
 }
 
@@ -185,18 +256,73 @@ extension NewTrackerViewController: UICollectionViewDataSource {
         _ collectionView: UICollectionView,
         cellForItemAt indexPath: IndexPath
     ) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! NewTrackerCollectionViewCell
+        let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: "cell",
+            for: indexPath
+        ) as! NewTrackerCollectionViewCell
         
-        cell.titleLabel.text = items[indexPath.row]
+        switch indexPath.row {
+        case 0:
+            cell.configure(title: items[indexPath.row], subtitle: trackerCategory)
+        case 1:
+            if !trackerWeekShedule.isEmpty {
+                cell.configure(title: items[indexPath.row], subtitle: configSheduleCell())
+            } else {
+                cell.configure(title: items[indexPath.row], subtitle: nil)
+            }
+            checkFieldsToUpdateCreateButton()
+        default:
+            print("swift требует эту ..")
+        }
+        
         return cell
+    }
+    
+    func configSheduleCell() -> String {
+        var days = trackerWeekShedule.compactMap {
+            if $0.isOn {
+                return $0.title
+            }
+            return nil
+        }
+        
+        var allDays = 0
+        for (index, day) in days.enumerated() {
+            if day == "Понедельник" {
+                days[index] = "Пн"
+            } else if day == "Вторник" {
+                days[index] = "Вт"
+            } else if day == "Среда" {
+                days[index] = "Ср"
+            } else if day == "Четверг" {
+                days[index] = "Чт"
+            } else if day == "Пятница" {
+                days[index] = "Пт"
+            } else if day == "Суббота" {
+                days[index] = "Сб"
+            } else if day == "Воскресенье" {
+                days[index] = "Вс"
+            }
+            allDays += 1
+        }
+        if allDays == trackerWeekShedule.count {
+            return "Каждый день"
+        }
+        
+        let result = days.map { $0 }.joined(separator: ", ")
+        return result
     }
 }
 
 extension NewTrackerViewController: SheduleDelegate {
-    func getWeekDays(_ week: [SwitchItem]) {
+    func getWeekDays(_ week: [WeekShedule]) {
         for day in week {
-            print(day.isOn)
+            trackerWeekShedule.append(day)
         }
+        for day in trackerWeekShedule {
+            print("\(day.title): \(day.isOn)")
+        }
+        collectionView.reloadData()
     }
 }
 
@@ -208,7 +334,12 @@ extension NewTrackerViewController: UICollectionViewDelegateFlowLayout {
         switch indexPath.row {
         case 0:
             print("Заглушка категории")
+            let cell = collectionView.cellForItem(at: indexPath) as? NewTrackerCollectionViewCell
+            trackerCategory = TrackerCategories.important
+            cell?.configure(title: items[indexPath.row], subtitle: trackerCategory)
+            checkFieldsToUpdateCreateButton()
         case 1:
+            trackerWeekShedule.removeAll(keepingCapacity: true)
             let sheduleVC = SheduleViewController(delegate: self)
             present(sheduleVC, animated: true)
         default:
