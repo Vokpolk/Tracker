@@ -1,7 +1,7 @@
 import UIKit
 
 @main
-class AppDelegate: UIResponder, UIApplicationDelegate {
+final class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
@@ -12,7 +12,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window = UIWindow()
         let tabBarController = TabBarController()
         tabBarController.tabBar.isTranslucent = false
-        tabBarController.tabBar.backgroundColor = .ypWhite
+        tabBarController.tabBar.backgroundColor = UIColor(resource: .ypWhite)
         window?.rootViewController = tabBarController
         window?.makeKeyAndVisible()
         return true
@@ -27,11 +27,5 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     ) -> UISceneConfiguration {
         return UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
     }
-
-    func application(
-        _ application: UIApplication,
-        didDiscardSceneSessions sceneSessions: Set<UISceneSession>
-    ) {}
-
 }
 

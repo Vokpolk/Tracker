@@ -4,7 +4,7 @@ final class NewTrackerCollectionViewCell: UICollectionViewCell {
     // MARK: - UI Elements
     let titleLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .ypBlack
+        label.textColor = UIColor(resource: .ypBlack)
         label.font = UIFont.systemFont(ofSize: 17, weight: .regular)
         label.textColor = .label
         label.numberOfLines = 1
@@ -13,7 +13,7 @@ final class NewTrackerCollectionViewCell: UICollectionViewCell {
     
     let subtitleLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .ypGray
+        label.textColor = UIColor(resource: .ypGray)
         label.font = UIFont.systemFont(ofSize: 17, weight: .regular)
         label.textColor = .secondaryLabel
         label.numberOfLines = 1
@@ -35,14 +35,14 @@ final class NewTrackerCollectionViewCell: UICollectionViewCell {
             .withRenderingMode(.alwaysTemplate)
         
         let imageView = UIImageView(image: arrowImage)
-        imageView.tintColor = .ypGray
+        imageView.tintColor = UIColor(resource: .ypGray)
         
         return imageView
     }()
     
     private let separatorView: UIView = {
         let view = UIView()
-        view.backgroundColor = .ypGray
+        view.backgroundColor = UIColor(resource: .ypGray)
         return view
     }()
     
@@ -58,7 +58,7 @@ final class NewTrackerCollectionViewCell: UICollectionViewCell {
             $0.translatesAutoresizingMaskIntoConstraints = false
             contentView.addSubview($0)
         }
-        contentView.backgroundColor = .ypBackground
+        contentView.backgroundColor = UIColor(resource: .ypBackground)
         NSLayoutConstraint.activate([
             stackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             stackView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),

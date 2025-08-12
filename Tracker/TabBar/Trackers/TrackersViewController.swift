@@ -32,7 +32,7 @@ final class TrackersViewController: UIViewController {
     
     private lazy var addTrackerButton: UIButton = {
         let trackerButton = UIButton.systemButton(
-            with: UIImage(named: "Add tracker")!,
+            with: UIImage(resource: .addTracker),
             target: nil,
             action: nil
         )
@@ -41,7 +41,7 @@ final class TrackersViewController: UIViewController {
             action: #selector(Self.didAddTrackerButtonTap),
             for: .touchUpInside
         )
-        trackerButton.tintColor = .ypBlack
+        trackerButton.tintColor = UIColor(resource: .ypBlack)
         return trackerButton
     }()
     
@@ -51,7 +51,7 @@ final class TrackersViewController: UIViewController {
         picker.datePickerMode = .date
         picker.locale = Locale(identifier: "ru_Ru")
         picker.calendar.firstWeekday = 2
-        picker.tintColor = .ypBlue
+        picker.tintColor = UIColor(resource: .ypBlue)
         picker.backgroundColor = .clear
         picker.subviews.forEach { $0.backgroundColor = .clear }
         picker.subviews.forEach { $0.tintColor = .clear }
@@ -72,9 +72,9 @@ final class TrackersViewController: UIViewController {
         let label = UILabel()
         currentDay = datePicker.date
         label.textAlignment = .center
-        label.textColor = .ypBlack
+        label.textColor = UIColor(resource: .ypBlack)
         label.font = UIFont.systemFont(ofSize: 17, weight: .regular)
-        label.backgroundColor = .ypGrayButton
+        label.backgroundColor = UIColor(resource: .ypGrayButton)
         label.translatesAutoresizingMaskIntoConstraints = false
         label.clipsToBounds = true
         label.layer.cornerRadius = 8
@@ -84,7 +84,7 @@ final class TrackersViewController: UIViewController {
     private lazy var trackerLabel: UILabel = {
         let label = UILabel()
         label.text = "Трекеры"
-        label.textColor = .ypBlack
+        label.textColor = UIColor(resource: .ypBlack)
         label.font = UIFont.systemFont(ofSize: 34, weight: .bold)
         return label
     }()
@@ -99,7 +99,7 @@ final class TrackersViewController: UIViewController {
     }()
     
     private lazy var placeholderImageView: UIImageView = {
-        let starImage = UIImage(named: "Dizzy")
+        let starImage = UIImage(resource: .dizzy)
         let placeholderImageView = UIImageView(image: starImage)
         return placeholderImageView
     }()
@@ -107,7 +107,7 @@ final class TrackersViewController: UIViewController {
     private lazy var questionLabel: UILabel = {
         let label = UILabel()
         label.text = "Что будем отслеживать?"
-        label.textColor = .ypBlack
+        label.textColor = UIColor(resource: .ypBlack)
         label.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         return label
     }()
@@ -150,7 +150,7 @@ final class TrackersViewController: UIViewController {
     }
     
     private func initUIObjects() {
-        view.backgroundColor = .ypWhite
+        view.backgroundColor = UIColor(resource: .ypWhite)
         updateDateText()
         [
             addTrackerButton,

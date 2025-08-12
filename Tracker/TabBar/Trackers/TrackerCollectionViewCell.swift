@@ -70,7 +70,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         emojiLabel.text = emoji
         
         // фон смайлика
-        emojiBackground.backgroundColor = UIColor(named: "YPEmojiBackground")
+        emojiBackground.backgroundColor = UIColor(resource: .ypEmojiBackground)
         emojiBackground.layer.cornerRadius = 12
         
         // имя трекера
@@ -100,8 +100,8 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
             action: #selector(Self.buttonTap),
             for: .touchUpInside
         )
-        let image = isCompletedToday ? UIImage(named: "Done") : UIImage(named: "Plus")
-        let coloredImage = image?.withTintColor(color)
+        let image = isCompletedToday ? UIImage(resource: .done) : UIImage(resource: .plus)
+        let coloredImage = image.withTintColor(color)
         button.setImage(coloredImage, for: .normal)
         
         // номер ячейки в коллекции

@@ -1,17 +1,17 @@
 import UIKit
 
-class SheduleCollectionViewCell: UICollectionViewCell {
+final class SheduleCollectionViewCell: UICollectionViewCell {
     // MARK: - UI Elements
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 17, weight: .regular)
-        label.textColor = .ypBlack
+        label.textColor = UIColor(resource: .ypBlack)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     private let separatorView: UIView = {
         let view = UIView()
-        view.backgroundColor = .ypGray
+        view.backgroundColor = UIColor(resource: .ypGray)
         return view
     }()
     
@@ -46,7 +46,7 @@ class SheduleCollectionViewCell: UICollectionViewCell {
             $0.translatesAutoresizingMaskIntoConstraints = false
             contentView.addSubview($0)
         }
-        contentView.backgroundColor = .ypBackground
+        contentView.backgroundColor = UIColor(resource: .ypBackground)
     }
     
     private func setupConstraints() {

@@ -35,7 +35,7 @@ final class NewTrackerViewController: UIViewController {
     private lazy var newHabitLabel: UILabel = {
         let label = UILabel()
         label.text = "Новая привычка"
-        label.textColor = .ypBlack
+        label.textColor = UIColor(resource: .ypBlack)
         label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         label.textAlignment = .center
         return label
@@ -46,7 +46,7 @@ final class NewTrackerViewController: UIViewController {
         enterTrackerName.placeholder = "Введите название трекера"
         enterTrackerName.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 16, height: enterTrackerName.frame.height))
         enterTrackerName.leftViewMode = .always
-        enterTrackerName.backgroundColor = .ypBackground
+        enterTrackerName.backgroundColor = UIColor(resource: .ypBackground)
         enterTrackerName.layer.cornerRadius = 16
         enterTrackerName.clearButtonMode = .whileEditing
         enterTrackerName.addTarget(
@@ -66,10 +66,10 @@ final class NewTrackerViewController: UIViewController {
         let button = UIButton(type: .system)
         button.setTitle("Отменить", for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        button.backgroundColor = .ypWhite
+        button.backgroundColor = UIColor(resource: .ypWhite)
         button.layer.borderWidth = 1
-        button.layer.borderColor = UIColor.ypRed.cgColor
-        button.setTitleColor(.ypRed, for: .normal)
+        button.layer.borderColor = UIColor(resource: .ypRed).cgColor
+        button.setTitleColor(UIColor(resource: .ypRed), for: .normal)
         button.layer.cornerRadius = 16
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(
@@ -84,7 +84,7 @@ final class NewTrackerViewController: UIViewController {
         let button = UIButton(type: .system)
         button.setTitle("Создать", for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        button.backgroundColor = .ypGray
+        button.backgroundColor = UIColor(resource: .ypGray)
         button.setTitleColor(.white, for: .normal)
         button.layer.cornerRadius = 16
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -116,7 +116,7 @@ final class NewTrackerViewController: UIViewController {
     
     // MARK: - Private Properties
     private func initUIObjects() {
-        view.backgroundColor = .ypWhite
+        view.backgroundColor = UIColor(resource: .ypWhite)
         stackView.addArrangedSubview(cancelButton)
         stackView.addArrangedSubview(createButton)
         [
@@ -196,7 +196,7 @@ final class NewTrackerViewController: UIViewController {
         return Tracker(
             id: NewTrackerViewController.trackerId,
             name: trackerTitle!,
-            color: .ypGreen,
+            color: UIColor(resource: .ypGreen),
             emoji: "🥸",
             weekDays: weekDays
         )
@@ -235,10 +235,10 @@ final class NewTrackerViewController: UIViewController {
             }
         }
         if trackerCategory == nil || trackerTitle == nil || isSheduleEmpty {
-            createButton.backgroundColor = .ypGray
+            createButton.backgroundColor = UIColor(resource: .ypGray)
             isCreateTrackerEnabled = false
         } else {
-            createButton.backgroundColor = .ypBlack
+            createButton.backgroundColor = UIColor(resource: .ypBlack)
             isCreateTrackerEnabled = true
         }
     }
@@ -280,10 +280,7 @@ extension NewTrackerViewController: UICollectionViewDataSource {
     
     func configSheduleCell() -> String {
         var days = trackerWeekShedule.compactMap {
-            if $0.isOn {
-                return $0.title
-            }
-            return nil
+            $0.isOn ? $0.title : nil
         }
         
         var allDays = 0

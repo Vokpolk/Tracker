@@ -1,6 +1,6 @@
 import UIKit
 
-class TrackersSupplementaryView: UICollectionReusableView {
+final class TrackersSupplementaryView: UICollectionReusableView {
     let titleLabel = UILabel()
     
     override init(frame: CGRect) {

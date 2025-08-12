@@ -40,7 +40,7 @@ final class SheduleViewController: UIViewController {
     private lazy var sheduleLabel: UILabel = {
         let label = UILabel()
         label.text = "Расписание"
-        label.textColor = .ypBlack
+        label.textColor = UIColor(resource: .ypBlack)
         label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         label.textAlignment = .center
         return label
@@ -50,7 +50,7 @@ final class SheduleViewController: UIViewController {
         let button = UIButton(type: .system)
         button.setTitle("Готово", for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        button.backgroundColor = .ypBlack
+        button.backgroundColor = UIColor(resource: .ypBlack)
         button.setTitleColor(.white, for: .normal)
         button.layer.cornerRadius = 16
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -81,7 +81,7 @@ final class SheduleViewController: UIViewController {
     
     // MARK: - Private Properties
     private func initUIObjects() {
-        view.backgroundColor = .ypWhite
+        view.backgroundColor = UIColor(resource: .ypWhite)
         [
             sheduleLabel,
             collectionView,
