@@ -313,7 +313,9 @@ extension TrackersViewController: TrackerCellDelegate {
         let trackerRecord = TrackerRecord(id: id, date: currentDay)
         completedTrackers.append(trackerRecord)
         
-        collectionView.reloadItems(at: [indexPath])
+        UIView.performWithoutAnimation {
+            collectionView.reloadItems(at: [indexPath])
+        }
     }
     
     func uncompleteTracker(id: UInt, at indexPath: IndexPath) {
@@ -321,7 +323,9 @@ extension TrackersViewController: TrackerCellDelegate {
             isSameTrackerRecord(trackerRecord, id: id)
         }
         
-        collectionView.reloadItems(at: [indexPath])
+        UIView.performWithoutAnimation {
+            collectionView.reloadItems(at: [indexPath])
+        }
     }
     
     private func isDateInFuture(_ selectedDate: Date) -> Bool {

@@ -19,6 +19,8 @@ final class SheduleViewController: UIViewController {
     ]
     private let cellHeight = 75
     
+    let scrollView = UIScrollView()
+    
     private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.minimumLineSpacing = 0.5
@@ -53,7 +55,6 @@ final class SheduleViewController: UIViewController {
         button.backgroundColor = UIColor(resource: .ypBlack)
         button.setTitleColor(.white, for: .normal)
         button.layer.cornerRadius = 16
-        button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(
             self,
             action: #selector(Self.readyButtonTap),
@@ -75,35 +76,51 @@ final class SheduleViewController: UIViewController {
     // MARK: - LifeCycles
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        initUIObjects()
+        scrollView.isScrollEnabled = true
+        scrollView.showsVerticalScrollIndicator = false
+        setupScrollView()
+        addUIElements()
     }
     
     // MARK: - Private Properties
-    private func initUIObjects() {
+    private func setupScrollView() {
         view.backgroundColor = UIColor(resource: .ypWhite)
+        
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(scrollView)
+        
+        NSLayoutConstraint.activate([
+            scrollView.topAnchor.constraint(equalTo: view.topAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+        ])
+    }
+    
+    private func addUIElements() {
         [
             sheduleLabel,
             collectionView,
             readyButton
         ].forEach {
+            scrollView.addSubview($0)
             $0.translatesAutoresizingMaskIntoConstraints = false
-            view.addSubview($0)
         }
         
         NSLayoutConstraint.activate([
-            sheduleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            sheduleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 25),
+            sheduleLabel.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
+            sheduleLabel.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: 25),
             collectionView.topAnchor.constraint(equalTo: sheduleLabel.bottomAnchor, constant: 30),
-            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant:  -16),
+            collectionView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 16),
+            collectionView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant:  -16),
             collectionView.bottomAnchor.constraint(equalTo: collectionView.topAnchor, constant: CGFloat(cellHeight * data.count) - 1),
-            readyButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            readyButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            readyButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
-            
-            // Фиксированная высота кнопок
+            collectionView.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
+            readyButton.topAnchor.constraint(equalTo: collectionView.bottomAnchor, constant: 16),
+            readyButton.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 20),
+            readyButton.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: -20),
             readyButton.heightAnchor.constraint(equalToConstant: 60),
+            readyButton.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
+            readyButton.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: 0)
         ])
         
         collectionView.dataSource = self

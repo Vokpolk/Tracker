@@ -9,11 +9,18 @@ final class NewTrackerViewController: UIViewController {
     private var trackerCategory: String? = nil
     private var trackerWeekShedule: [WeekShedule] = []
     private var isCreateTrackerEnabled: Bool = false
+    
     private let items = [
         "Категория",
         "Расписание"
     ]
     private let cellHeight = 75
+    
+    private let emojies = [
+        "🍇", "🍈", "🍉", "🍊", "🍋", "🍌",
+        "🍍", "🥭", "🍎", "🍏", "🍐", "🍒",
+        "🍓", "🫐", "🥝", "🍅", "🫒", "🥥"
+    ]
     private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.minimumLineSpacing = 0.5
@@ -23,12 +30,24 @@ final class NewTrackerViewController: UIViewController {
         )
         collectionView.register(
             NewTrackerCollectionViewCell.self,
-            forCellWithReuseIdentifier: "cell"
+            forCellWithReuseIdentifier: "categoryAndSheduleCell"
         )
         collectionView.layer.cornerRadius = 16
         collectionView.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner, .layerMinXMaxYCorner, .layerMaxXMaxYCorner]
         collectionView.clipsToBounds = true
         collectionView.isScrollEnabled = false
+        return collectionView
+    }()
+    
+    private lazy var emojiCollectionView = {
+        let collectionView = UICollectionView(
+            frame: .zero,
+            collectionViewLayout: UICollectionViewFlowLayout()
+        )
+        collectionView.register(
+            EmojiCollectionViewCell.self,
+            forCellWithReuseIdentifier: "emojiCell"
+        )
         return collectionView
     }()
     
@@ -123,6 +142,7 @@ final class NewTrackerViewController: UIViewController {
             newHabitLabel,
             enterTrackerName,
             collectionView,
+            emojiCollectionView,
             stackView
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
@@ -143,6 +163,11 @@ final class NewTrackerViewController: UIViewController {
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant:  -16),
             collectionView.bottomAnchor.constraint(equalTo: collectionView.topAnchor, constant: CGFloat(cellHeight * items.count) - 1),
             
+            emojiCollectionView.topAnchor.constraint(equalTo: collectionView.bottomAnchor, constant: 24),
+            emojiCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            emojiCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant:  -16),
+            emojiCollectionView.bottomAnchor.constraint(equalTo: emojiCollectionView.topAnchor, constant: CGFloat(204)),
+            
             stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             stackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
@@ -151,9 +176,10 @@ final class NewTrackerViewController: UIViewController {
             cancelButton.heightAnchor.constraint(equalToConstant: 60),
             createButton.heightAnchor.constraint(equalToConstant: 60)
         ])
-        
-        collectionView.dataSource = self
-        collectionView.delegate = self
+        [collectionView, emojiCollectionView].forEach {
+            $0.dataSource = self
+            $0.delegate = self
+        }
     }
     
     @objc private func cancelButtonTap() {
@@ -243,39 +269,52 @@ final class NewTrackerViewController: UIViewController {
         }
     }
 }
-
+// MARK: - UICollectionViewDataSource
 extension NewTrackerViewController: UICollectionViewDataSource {
     func collectionView(
         _ collectionView: UICollectionView,
         numberOfItemsInSection section: Int
     ) -> Int {
-        return items.count
+        if collectionView == self.collectionView {
+            return items.count
+        } else {
+            return emojies.count
+        }
     }
     
     func collectionView(
         _ collectionView: UICollectionView,
         cellForItemAt indexPath: IndexPath
     ) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(
-            withReuseIdentifier: "cell",
-            for: indexPath
-        ) as! NewTrackerCollectionViewCell
-        
-        switch indexPath.row {
-        case 0:
-            cell.configure(title: items[indexPath.row], subtitle: trackerCategory)
-        case 1:
-            if !trackerWeekShedule.isEmpty {
-                cell.configure(title: items[indexPath.row], subtitle: configSheduleCell())
-            } else {
-                cell.configure(title: items[indexPath.row], subtitle: nil)
+        if collectionView == self.collectionView {
+            let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: "categoryAndSheduleCell",
+                for: indexPath
+            ) as! NewTrackerCollectionViewCell
+            
+            switch indexPath.row {
+            case 0:
+                cell.configure(title: items[indexPath.row], subtitle: trackerCategory)
+            case 1:
+                if !trackerWeekShedule.isEmpty {
+                    cell.configure(title: items[indexPath.row], subtitle: configSheduleCell())
+                } else {
+                    cell.configure(title: items[indexPath.row], subtitle: nil)
+                }
+                checkFieldsToUpdateCreateButton()
+            default:
+                print("swift требует эту ..")
             }
-            checkFieldsToUpdateCreateButton()
-        default:
-            print("swift требует эту ..")
+            
+            return cell
+        } else {
+            let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: "emojiCell",
+                for: indexPath
+            ) as! EmojiCollectionViewCell
+            cell.configure(title: emojies[indexPath.row])
+            return cell
         }
-        
-        return cell
     }
     
     func configSheduleCell() -> String {
@@ -310,7 +349,7 @@ extension NewTrackerViewController: UICollectionViewDataSource {
         return result
     }
 }
-
+// MARK: - SheduleDelegate
 extension NewTrackerViewController: SheduleDelegate {
     func getWeekDays(_ week: [WeekShedule]) {
         for day in week {
@@ -322,7 +361,7 @@ extension NewTrackerViewController: SheduleDelegate {
         collectionView.reloadData()
     }
 }
-
+// MARK: - UICollectionViewDelegateFlowLayout
 extension NewTrackerViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(
         _ collectionView: UICollectionView,
@@ -349,7 +388,11 @@ extension NewTrackerViewController: UICollectionViewDelegateFlowLayout {
         layout collectionViewLayout: UICollectionViewLayout,
         sizeForItemAt indexPath: IndexPath
     ) -> CGSize {
-        return CGSize(width: collectionView.bounds.width, height: 75)
+        if collectionView == self.collectionView {
+            return CGSize(width: collectionView.bounds.width, height: 75)
+        } else {
+            return CGSize(width: collectionView.bounds.width / 6 - 10, height: 50)
+        }
     }
     
     func collectionView(
