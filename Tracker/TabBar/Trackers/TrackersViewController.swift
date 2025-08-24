@@ -317,7 +317,10 @@ extension TrackersViewController: UICollectionViewDataSource {
             ofKind: kind,
             withReuseIdentifier: id,
             for: indexPath
-        ) as! TrackersSupplementaryView
+        ) as? TrackersSupplementaryView
+        guard let view else {
+            return UICollectionReusableView()
+        }
         view.titleLabel.text = TrackerCategories.important
         return view
     }

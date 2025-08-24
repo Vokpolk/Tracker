@@ -6,7 +6,7 @@ extension TrackerCoreData {
         Tracker(
             id: UInt(id),
             name: name ?? "",
-            color: color as! UIColor,
+            color: color as? UIColor ?? UIColor(resource: .ypWhite),
             emoji: emoji ?? "",
             weekDays: WeekBitmask.maskToDays(weekDays)
         )

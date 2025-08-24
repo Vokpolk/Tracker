@@ -142,7 +142,11 @@ extension SheduleViewController: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "SwitchCell", for: indexPath) as! SheduleCollectionViewCell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "SwitchCell", for: indexPath) as? SheduleCollectionViewCell
+        guard let cell else {
+            return UICollectionViewCell()
+        }
+        
         let item = data[indexPath.item]
         
         cell.configure(with: item.title, isOn: item.isOn)

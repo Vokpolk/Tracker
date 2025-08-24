@@ -7,7 +7,7 @@ final class ColorCollectionViewCell: UICollectionViewCell {
         view.backgroundColor = UIColor(resource: .ypWhite)
         view.layer.borderColor = UIColor(resource: .ypWhite).cgColor
         view.layer.borderWidth = 3
-        view.layer.cornerRadius = 8
+        view.layer.cornerRadius = 12
         return view
     }()
     private lazy var colorView: UIView = {
@@ -54,7 +54,7 @@ final class ColorCollectionViewCell: UICollectionViewCell {
     func isCellPressed(_ pressed: Bool) {
         isPressed = pressed
         if pressed {
-            borderColorView.layer.borderColor = colorView.backgroundColor?.cgColor
+            borderColorView.layer.borderColor = colorView.backgroundColor?.withAlphaComponent(0.5).cgColor
         } else {
             borderColorView.layer.borderColor = UIColor(resource: .ypWhite).cgColor
         }

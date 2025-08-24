@@ -10,7 +10,7 @@ final class ColorSupplementaryView: UICollectionReusableView {
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 28),
+            titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10),
             titleLabel.topAnchor.constraint(equalTo: topAnchor),
             titleLabel.bottomAnchor.constraint(equalTo: bottomAnchor),
         ])

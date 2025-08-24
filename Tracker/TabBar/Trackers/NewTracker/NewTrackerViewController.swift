@@ -21,9 +21,9 @@ final class NewTrackerViewController: UIViewController {
     private let cellHeight = 75
     
     private let emojies = [
-        "🍇", "🍈", "🍉", "🍊", "🍋", "🍌",
-        "🍍", "🥭", "🍎", "🍏", "🍐", "🍒",
-        "🍓", "🫐", "🥝", "🍅", "🫒", "🥥"
+        "🙂", "😻", "🌺", "🐶", "❤️", "😱",
+        "😇", "😡", "🥶", "🤔", "🙌", "🍔",
+        "🥦", "🏓", "🥇", "🎸", "🏝️", "😪"
     ]
     private let colors = [
         UIColor(resource: .ypColor1), UIColor(resource: .ypColor2),
@@ -300,9 +300,9 @@ final class NewTrackerViewController: UIViewController {
         print("id нового трекера: \(NewTrackerViewController.trackerId)")
         return Tracker(
             id: NewTrackerViewController.trackerId,
-            name: trackerTitle!,
-            color: trackerColor!,
-            emoji: trackerEmoji!,
+            name: trackerTitle ?? "",
+            color: trackerColor ?? UIColor(resource: .ypWhite),
+            emoji: trackerEmoji ?? "",
             weekDays: weekDays
         )
     }
@@ -376,7 +376,11 @@ extension NewTrackerViewController: UICollectionViewDataSource {
             let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: "categoryAndSheduleCell",
                 for: indexPath
-            ) as! NewTrackerCollectionViewCell
+            ) as? NewTrackerCollectionViewCell
+            
+            guard let cell else {
+                return UICollectionViewCell()
+            }
             
             switch indexPath.row {
             case 0:
@@ -397,14 +401,22 @@ extension NewTrackerViewController: UICollectionViewDataSource {
             let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: "emojiCell",
                 for: indexPath
-            ) as! EmojiCollectionViewCell
+            ) as? EmojiCollectionViewCell
+            
+            guard let cell else {
+                return UICollectionViewCell()
+            }
             cell.configure(title: emojies[indexPath.row])
             return cell
         } else {
             let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: "colorCell",
                 for: indexPath
-            ) as! ColorCollectionViewCell
+            ) as? ColorCollectionViewCell
+            
+            guard let cell else {
+                return UICollectionViewCell()
+            }
             cell.configure(color: colors[indexPath.row])
             return cell
         }
@@ -462,7 +474,10 @@ extension NewTrackerViewController: UICollectionViewDataSource {
                 ofKind: kind,
                 withReuseIdentifier: id,
                 for: indexPath
-            ) as! EmojiSupplementaryView
+            ) as? EmojiSupplementaryView
+            guard let view else {
+                return UICollectionReusableView()
+            }
             view.titleLabel.text = "Emoji"
             return view
         } else if collectionView == colorCollectionView {
@@ -480,7 +495,10 @@ extension NewTrackerViewController: UICollectionViewDataSource {
                 ofKind: kind,
                 withReuseIdentifier: id,
                 for: indexPath
-            ) as! ColorSupplementaryView
+            ) as? ColorSupplementaryView
+            guard let view else {
+                return UICollectionReusableView()
+            }
             view.titleLabel.text = "Цвет"
             return view
         }
