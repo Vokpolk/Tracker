@@ -2,7 +2,7 @@ import UIKit
 
 final class NewTrackerCollectionViewCell: UICollectionViewCell {
     // MARK: - UI Elements
-    let titleLabel: UILabel = {
+    private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.textColor = UIColor(resource: .ypBlack)
         label.font = UIFont.systemFont(ofSize: 17, weight: .regular)
@@ -11,7 +11,7 @@ final class NewTrackerCollectionViewCell: UICollectionViewCell {
         return label
     }()
     
-    let subtitleLabel: UILabel = {
+    private lazy var subtitleLabel: UILabel = {
         let label = UILabel()
         label.textColor = UIColor(resource: .ypGray)
         label.font = UIFont.systemFont(ofSize: 17, weight: .regular)
@@ -30,7 +30,7 @@ final class NewTrackerCollectionViewCell: UICollectionViewCell {
         return stack
     }()
     
-    private let arrowImageView: UIImageView = {
+    private lazy var arrowImageView: UIImageView = {
         let arrowImage = UIImage(systemName: "chevron.right")?
             .withRenderingMode(.alwaysTemplate)
         
@@ -40,12 +40,13 @@ final class NewTrackerCollectionViewCell: UICollectionViewCell {
         return imageView
     }()
     
-    private let separatorView: UIView = {
+    private lazy var separatorView: UIView = {
         let view = UIView()
         view.backgroundColor = UIColor(resource: .ypGray)
         return view
     }()
     
+    // MARK: - Initializers
     override init(frame: CGRect) {
         super.init(frame: frame)
         stackView.addArrangedSubview(titleLabel)
@@ -79,6 +80,7 @@ final class NewTrackerCollectionViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - Public Methods
     func configure(title: String, subtitle: String?) {
         titleLabel.text = title
         

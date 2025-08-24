@@ -17,7 +17,7 @@ final class SheduleCollectionViewCell: UICollectionViewCell {
     
     let cellSwitch: UISwitch = {
         let sw = UISwitch()
-        sw.onTintColor = .systemBlue  // Цвет включенного состояния
+        sw.onTintColor = .systemBlue
         sw.translatesAutoresizingMaskIntoConstraints = false
         return sw
     }()
@@ -51,16 +51,13 @@ final class SheduleCollectionViewCell: UICollectionViewCell {
     
     private func setupConstraints() {
         NSLayoutConstraint.activate([
-            // Title label constraints
             titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: cellSwitch.leadingAnchor, constant: -16),
             
-            // Switch constraints
             cellSwitch.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             cellSwitch.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             
-            // Separator constraints
             separatorView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
             separatorView.trailingAnchor.constraint(equalTo: trailingAnchor, constant:  -16),
             separatorView.bottomAnchor.constraint(equalTo: bottomAnchor),

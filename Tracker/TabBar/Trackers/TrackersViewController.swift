@@ -112,16 +112,48 @@ final class TrackersViewController: UIViewController {
         return label
     }()
     
+    private let trackerStore: TrackerStore
+    private let trackerRecordStore: TrackerRecordStore
+    private let trackerCategoryStore: TrackerCategoryStore
+    
+    // MARK: - Initializers
+    
+    init(trackerStore: TrackerStore,
+         trackerRecordStore: TrackerRecordStore,
+         trackerCategoryStore: TrackerCategoryStore
+    ) {
+        self.trackerStore = trackerStore
+        self.trackerRecordStore = trackerRecordStore
+        self.trackerCategoryStore = trackerCategoryStore
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     // MARK: - LifeCycles
     override func viewDidLoad() {
         super.viewDidLoad()
         hideKeyboardEvent()
         initUIObjects()
+        trackerStore.delegate = self
+        trackerRecordStore.delegate = self
+        
+        completedTrackers = trackerRecordStore.trackerRecords
+        categories.append(
+            TrackerCategory(
+                title: TrackerCategories.important,
+                trackers: trackerStore.trackers
+            )
+        )
+        dateChanged()
+        collectionView.reloadData()
     }
 
     // MARK: - Private Methods
     @objc private func didAddTrackerButtonTap() {
-        let newTrackerViewController = NewTrackerViewController()
+        let newTrackerViewController = NewTrackerViewController(trackerStore: trackerStore)
         newTrackerViewController.delegate = self
         present(newTrackerViewController, animated: true)
     }
@@ -285,7 +317,10 @@ extension TrackersViewController: UICollectionViewDataSource {
             ofKind: kind,
             withReuseIdentifier: id,
             for: indexPath
-        ) as! TrackersSupplementaryView
+        ) as? TrackersSupplementaryView
+        guard let view else {
+            return UICollectionReusableView()
+        }
         view.titleLabel.text = TrackerCategories.important
         return view
     }
@@ -310,18 +345,29 @@ extension TrackersViewController: TrackerCellDelegate {
         if isDateInFuture(currentDay) {
             return
         }
+        
         let trackerRecord = TrackerRecord(id: id, date: currentDay)
         completedTrackers.append(trackerRecord)
+        trackerRecordStore.addNewTrackerRecord(trackerRecord)
         
-        collectionView.reloadItems(at: [indexPath])
+        UIView.performWithoutAnimation {
+            collectionView.reloadItems(at: [indexPath])
+        }
     }
     
     func uncompleteTracker(id: UInt, at indexPath: IndexPath) {
+        for trackerRecord in completedTrackers {
+            if isSameTrackerRecord(trackerRecord, id: id) {
+                trackerRecordStore.removeTrackerRecord(id, with: trackerRecord.date)
+            }
+        }
         completedTrackers.removeAll { trackerRecord in
             isSameTrackerRecord(trackerRecord, id: id)
         }
         
-        collectionView.reloadItems(at: [indexPath])
+        UIView.performWithoutAnimation {
+            collectionView.reloadItems(at: [indexPath])
+        }
     }
     
     private func isDateInFuture(_ selectedDate: Date) -> Bool {
@@ -373,17 +419,26 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
 // MARK: - TrackersDelegate
 extension TrackersViewController: TrackersDelegate {
     func createTracker(_ tracker: Tracker) {
-        var trackers = defaultCategory.trackers
-        trackers.append(tracker)
-        defaultCategory = TrackerCategory(
-            title: TrackerCategories.important,
-            trackers: trackers
-        )
-        categories.removeAll() // TODO: пока одна категория
-        categories.append(defaultCategory)
-        print("Прилетели на главный экран")
-        print("Давай создавай трекер!")
+        categories[0].trackers.append(tracker)
         dateChanged()
+        do {
+            try trackerStore.addNewTracker(tracker)
+        } catch {
+            assertionFailure("Не получилось создать Tracker в БД")
+        }
+    }
+}
+
+// MARK: - TrackerStoreDelegate
+extension TrackersViewController: TrackerStoreDelegate {
+    func store(_ store: TrackerStore) {
+        collectionView.reloadData()
+    }
+}
+
+// MARK: - TrackerRecordStoreDelegate
+extension TrackersViewController: TrackerRecordStoreDelegate {
+    func store(_ store: TrackerRecordStore) {
         collectionView.reloadData()
     }
 }
