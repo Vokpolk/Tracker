@@ -1,6 +1,6 @@
 import UIKit
 
-enum WeekDay: Int {
+enum WeekDay: Int, Codable {
     case sunday = 1
     case monday
     case tuesday
@@ -15,6 +15,5 @@ struct Tracker {
     let name: String
     let color: UIColor
     let emoji: String
-    //let shedule: Shedule
     let weekDays: [WeekDay]
 }

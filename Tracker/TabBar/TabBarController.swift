@@ -2,10 +2,17 @@ import UIKit
 
 final class TabBarController: UITabBarController {
     
-    override func viewDidLoad() {
-        self.tabBar.addFullBorder()
+    init(trackerStore: TrackerStore,
+         trackerRecordStore: TrackerRecordStore,
+         trackerCategoryStore: TrackerCategoryStore
+    ) {
         
-        let trackersViewController = TrackersViewController()
+        super.init(nibName: nil, bundle: nil)
+        let trackersViewController = TrackersViewController(
+            trackerStore: trackerStore,
+            trackerRecordStore: trackerRecordStore,
+            trackerCategoryStore: trackerCategoryStore
+        )
         trackersViewController.tabBarItem = UITabBarItem(
             title: "Трекеры",
             image: UIImage(resource: .tabBarTracker),
@@ -21,16 +28,24 @@ final class TabBarController: UITabBarController {
         
         self.viewControllers = [trackersViewController, statisticViewController]
     }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func viewDidLoad() {
+        self.tabBar.addFullBorder()
+        
+        
+    }
 }
 
 extension UITabBar {
     func addFullBorder(color: UIColor = .lightGray, width: CGFloat = 0.5) {
-        // Создаем новый слой для границы
         let borderLayer = CALayer()
         borderLayer.name = "borderLayer"
         borderLayer.backgroundColor = color.cgColor
         
-        // Верхняя граница
         borderLayer.frame = CGRect(x: 0, y: 0, width: frame.width, height: width)
         layer.addSublayer(borderLayer)
     }

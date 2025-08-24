@@ -55,25 +55,19 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         isCompletedToday: Bool,
         indexPath: IndexPath
     ) {
-        // номер трекера
         trackerId = id
         
-        // цвет
         self.color = color
         
-        // карточка
         cardBackground.backgroundColor = color
         cardBackground.layer.cornerRadius = 16
         
-        // смайлик
         emojiLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         emojiLabel.text = emoji
         
-        // фон смайлика
         emojiBackground.backgroundColor = UIColor(resource: .ypEmojiBackground)
         emojiBackground.layer.cornerRadius = 12
         
-        // имя трекера
         trackerName.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         trackerName.numberOfLines = 0
         trackerName.textAlignment = .left
@@ -81,20 +75,16 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         trackerName.text = tracker
         trackerName.textColor = .white
         
-        // количество дней
         daysCount.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         daysCount.textAlignment = .left
         let wordDay = pluralizeDays(completedDays)
         daysCount.text = wordDay
         daysCount.textColor = .black
         
-        // дни недели
         self.weekDays = weekDays
         
-        // завершен ли трекер сегодня
         self.isCompletedToday = isCompletedToday
         
-        // кнопка
         button.addTarget(
             self,
             action: #selector(Self.buttonTap),
@@ -104,7 +94,6 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         let coloredImage = image.withTintColor(color)
         button.setImage(coloredImage, for: .normal)
         
-        // номер ячейки в коллекции
         self.indexPath = indexPath
     }
     

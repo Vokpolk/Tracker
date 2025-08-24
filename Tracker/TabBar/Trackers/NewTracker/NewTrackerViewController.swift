@@ -5,9 +5,13 @@ final class NewTrackerViewController: UIViewController {
     weak var delegate: TrackersDelegate?
     // MARK: - Private Properties
     static var trackerId: UInt = 0
+    
+    private let scrollView: UIScrollView = UIScrollView()
     private var trackerTitle: String? = nil
     private var trackerCategory: String? = nil
     private var trackerWeekShedule: [WeekShedule] = []
+    private var trackerEmoji: String? = nil
+    private var trackerColor: UIColor? = nil
     private var isCreateTrackerEnabled: Bool = false
     
     private let items = [
@@ -20,6 +24,17 @@ final class NewTrackerViewController: UIViewController {
         "🍇", "🍈", "🍉", "🍊", "🍋", "🍌",
         "🍍", "🥭", "🍎", "🍏", "🍐", "🍒",
         "🍓", "🫐", "🥝", "🍅", "🫒", "🥥"
+    ]
+    private let colors = [
+        UIColor(resource: .ypColor1), UIColor(resource: .ypColor2),
+        UIColor(resource: .ypColor3), UIColor(resource: .ypColor4),
+        UIColor(resource: .ypColor5), UIColor(resource: .ypColor6),
+        UIColor(resource: .ypColor7), UIColor(resource: .ypColor8),
+        UIColor(resource: .ypColor9), UIColor(resource: .ypColor10),
+        UIColor(resource: .ypColor11), UIColor(resource: .ypColor12),
+        UIColor(resource: .ypColor13), UIColor(resource: .ypColor14),
+        UIColor(resource: .ypColor15), UIColor(resource: .ypColor16),
+        UIColor(resource: .ypColor17), UIColor(resource: .ypColor18)
     ]
     private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -45,8 +60,30 @@ final class NewTrackerViewController: UIViewController {
             collectionViewLayout: UICollectionViewFlowLayout()
         )
         collectionView.register(
+            EmojiSupplementaryView.self,
+            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+            withReuseIdentifier: "emojiHeader"
+        )
+        collectionView.register(
             EmojiCollectionViewCell.self,
             forCellWithReuseIdentifier: "emojiCell"
+        )
+        return collectionView
+    }()
+    
+    private lazy var colorCollectionView = {
+        let collectionView = UICollectionView(
+            frame: .zero,
+            collectionViewLayout: UICollectionViewFlowLayout()
+        )
+        collectionView.register(
+            ColorSupplementaryView.self,
+            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+            withReuseIdentifier: "colorHeader"
+        )
+        collectionView.register(
+            ColorCollectionViewCell.self,
+            forCellWithReuseIdentifier: "colorCell"
         )
         return collectionView
     }()
@@ -120,20 +157,50 @@ final class NewTrackerViewController: UIViewController {
         stack.axis = .horizontal
         stack.alignment = .center
         stack.distribution = .fillEqually
-        stack.spacing = 8 // Расстояние между кнопками
+        stack.spacing = 8
         stack.translatesAutoresizingMaskIntoConstraints = false
         return stack
     }()
+
+    private let trackerStore: TrackerStore
+    
+    // MARK: - Initializers
+    
+    init(trackerStore: TrackerStore) {
+        self.trackerStore = trackerStore
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     // MARK: - LifeCycles
     override func viewDidLoad() {
         super.viewDidLoad()
+        scrollView.isScrollEnabled = true
+        scrollView.showsVerticalScrollIndicator = false
         
+        setupScrollView()
         hideKeyboardEvent()
         initUIObjects()
     }
     
-    // MARK: - Private Properties
+    // MARK: - Private Methods
+    private func setupScrollView() {
+        view.backgroundColor = UIColor(resource: .ypWhite)
+        
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(scrollView)
+        
+        NSLayoutConstraint.activate([
+            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
+    }
+    
     private func initUIObjects() {
         view.backgroundColor = UIColor(resource: .ypWhite)
         stackView.addArrangedSubview(cancelButton)
@@ -143,40 +210,51 @@ final class NewTrackerViewController: UIViewController {
             enterTrackerName,
             collectionView,
             emojiCollectionView,
+            colorCollectionView,
             stackView
         ].forEach {
+            scrollView.addSubview($0)
             $0.translatesAutoresizingMaskIntoConstraints = false
-            view.addSubview($0)
         }
         
         NSLayoutConstraint.activate([
-            newHabitLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            newHabitLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 25),
+            newHabitLabel.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
+            newHabitLabel.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: 25),
             
             enterTrackerName.topAnchor.constraint(equalTo: newHabitLabel.bottomAnchor, constant: 38),
-            enterTrackerName.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            enterTrackerName.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            enterTrackerName.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 16),
+            enterTrackerName.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: -16),
             enterTrackerName.heightAnchor.constraint(equalToConstant: 75),
+            enterTrackerName.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
             
             collectionView.topAnchor.constraint(equalTo: enterTrackerName.bottomAnchor, constant: 24),
-            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant:  -16),
+            collectionView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 16),
+            collectionView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant:  -16),
             collectionView.bottomAnchor.constraint(equalTo: collectionView.topAnchor, constant: CGFloat(cellHeight * items.count) - 1),
+            collectionView.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
             
-            emojiCollectionView.topAnchor.constraint(equalTo: collectionView.bottomAnchor, constant: 24),
-            emojiCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            emojiCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant:  -16),
-            emojiCollectionView.bottomAnchor.constraint(equalTo: emojiCollectionView.topAnchor, constant: CGFloat(204)),
+            emojiCollectionView.topAnchor.constraint(equalTo: collectionView.bottomAnchor, constant: 32),
+            emojiCollectionView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 19),
+            emojiCollectionView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant:  -19),
+            emojiCollectionView.bottomAnchor.constraint(equalTo: emojiCollectionView.topAnchor, constant: CGFloat(220)),
+            emojiCollectionView.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
             
-            stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            stackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            colorCollectionView.topAnchor.constraint(equalTo: emojiCollectionView.bottomAnchor, constant: 16),
+            colorCollectionView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 19),
+            colorCollectionView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant:  -19),
+            colorCollectionView.bottomAnchor.constraint(equalTo: colorCollectionView.topAnchor, constant: CGFloat(220)),
+            colorCollectionView.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
             
-            // Фиксированная высота кнопок
+            stackView.topAnchor.constraint(equalTo: colorCollectionView.bottomAnchor, constant: 10),
+            stackView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 20),
+            stackView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: -20),
+            stackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+            stackView.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
+            
             cancelButton.heightAnchor.constraint(equalToConstant: 60),
             createButton.heightAnchor.constraint(equalToConstant: 60)
         ])
-        [collectionView, emojiCollectionView].forEach {
+        [collectionView, emojiCollectionView, colorCollectionView].forEach {
             $0.dataSource = self
             $0.delegate = self
         }
@@ -218,12 +296,13 @@ final class NewTrackerViewController: UIViewController {
         let weekDays = optionalWeekDays.compactMap{
             $0
         }
-        NewTrackerViewController.trackerId += 1
+        NewTrackerViewController.trackerId = trackerStore.countFetch() + 1
+        print("id нового трекера: \(NewTrackerViewController.trackerId)")
         return Tracker(
             id: NewTrackerViewController.trackerId,
             name: trackerTitle!,
-            color: UIColor(resource: .ypGreen),
-            emoji: "🥸",
+            color: trackerColor!,
+            emoji: trackerEmoji!,
             weekDays: weekDays
         )
     }
@@ -260,7 +339,12 @@ final class NewTrackerViewController: UIViewController {
                 break
             }
         }
-        if trackerCategory == nil || trackerTitle == nil || isSheduleEmpty {
+        if trackerCategory == nil ||
+            trackerTitle == nil ||
+            trackerEmoji == nil ||
+            trackerColor == nil ||
+            isSheduleEmpty
+        {
             createButton.backgroundColor = UIColor(resource: .ypGray)
             isCreateTrackerEnabled = false
         } else {
@@ -277,8 +361,10 @@ extension NewTrackerViewController: UICollectionViewDataSource {
     ) -> Int {
         if collectionView == self.collectionView {
             return items.count
-        } else {
+        } else if collectionView == emojiCollectionView {
             return emojies.count
+        } else {
+            return colors.count
         }
     }
     
@@ -307,12 +393,19 @@ extension NewTrackerViewController: UICollectionViewDataSource {
             }
             
             return cell
-        } else {
+        } else if collectionView == emojiCollectionView {
             let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: "emojiCell",
                 for: indexPath
             ) as! EmojiCollectionViewCell
             cell.configure(title: emojies[indexPath.row])
+            return cell
+        } else {
+            let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: "colorCell",
+                for: indexPath
+            ) as! ColorCollectionViewCell
+            cell.configure(color: colors[indexPath.row])
             return cell
         }
     }
@@ -348,6 +441,53 @@ extension NewTrackerViewController: UICollectionViewDataSource {
         let result = days.map { $0 }.joined(separator: ", ")
         return result
     }
+    
+    func collectionView(
+        _ collectionView: UICollectionView,
+        viewForSupplementaryElementOfKind kind: String,
+        at indexPath: IndexPath
+    ) -> UICollectionReusableView {
+        if collectionView == emojiCollectionView {
+            var id: String
+            switch kind {
+            case UICollectionView.elementKindSectionHeader:
+                id = "emojiHeader"
+            case UICollectionView.elementKindSectionFooter:
+                id = "footer"
+            default:
+                id = ""
+            }
+            
+            let view = collectionView.dequeueReusableSupplementaryView(
+                ofKind: kind,
+                withReuseIdentifier: id,
+                for: indexPath
+            ) as! EmojiSupplementaryView
+            view.titleLabel.text = "Emoji"
+            return view
+        } else if collectionView == colorCollectionView {
+            var id: String
+            switch kind {
+            case UICollectionView.elementKindSectionHeader:
+                id = "colorHeader"
+            case UICollectionView.elementKindSectionFooter:
+                id = "footer"
+            default:
+                id = ""
+            }
+            
+            let view = collectionView.dequeueReusableSupplementaryView(
+                ofKind: kind,
+                withReuseIdentifier: id,
+                for: indexPath
+            ) as! ColorSupplementaryView
+            view.titleLabel.text = "Цвет"
+            return view
+        }
+        else {
+            return UICollectionReusableView()
+        }
+    }
 }
 // MARK: - SheduleDelegate
 extension NewTrackerViewController: SheduleDelegate {
@@ -365,33 +505,16 @@ extension NewTrackerViewController: SheduleDelegate {
 extension NewTrackerViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(
         _ collectionView: UICollectionView,
-        didSelectItemAt indexPath: IndexPath
-    ) {
-        switch indexPath.row {
-        case 0:
-            print("Заглушка категории")
-            let cell = collectionView.cellForItem(at: indexPath) as? NewTrackerCollectionViewCell
-            trackerCategory = TrackerCategories.important
-            cell?.configure(title: items[indexPath.row], subtitle: trackerCategory)
-            checkFieldsToUpdateCreateButton()
-        case 1:
-            trackerWeekShedule.removeAll(keepingCapacity: true)
-            let sheduleVC = SheduleViewController(delegate: self)
-            present(sheduleVC, animated: true)
-        default:
-            break
-        }
-    }
-    
-    func collectionView(
-        _ collectionView: UICollectionView,
         layout collectionViewLayout: UICollectionViewLayout,
         sizeForItemAt indexPath: IndexPath
     ) -> CGSize {
         if collectionView == self.collectionView {
             return CGSize(width: collectionView.bounds.width, height: 75)
         } else {
-            return CGSize(width: collectionView.bounds.width / 6 - 10, height: 50)
+            return CGSize(
+                width: collectionView.bounds.width / 6 - 5,
+                height: collectionView.bounds.width / 6 - 5
+            )
         }
     }
     
@@ -400,6 +523,100 @@ extension NewTrackerViewController: UICollectionViewDelegateFlowLayout {
         layout collectionViewLayout: UICollectionViewLayout,
         minimumLineSpacingForSectionAt section: Int
     ) -> CGFloat {
+        if collectionView == self.collectionView {
+            return 0
+        } else {
+            return 5
+        }
+    }
+    
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        minimumInteritemSpacingForSectionAt section: Int
+    ) -> CGFloat {
         0
+    }
+    
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        insetForSectionAt section: Int
+    ) -> UIEdgeInsets {
+        if collectionView == self.collectionView {
+            UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+        }
+        else {
+            UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0)
+        }
+    }
+    
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        referenceSizeForHeaderInSection section: Int
+    ) -> CGSize {
+        if collectionView == self.collectionView {
+            return CGSize(width: 0, height: 0)
+        } else {
+            return CGSize(
+                width: collectionView.frame.width,
+                height: 25
+            )
+        }
+    }
+    
+    // MARK: - Выделение ячейки
+    func collectionView(
+        _ collectionView: UICollectionView,
+        didSelectItemAt indexPath: IndexPath
+    ) {
+        if collectionView == self.collectionView {
+            switch indexPath.row {
+            case 0:
+                print("Заглушка категории")
+                let cell = collectionView.cellForItem(at: indexPath) as? NewTrackerCollectionViewCell
+                trackerCategory = TrackerCategories.important
+                cell?.configure(title: items[indexPath.row], subtitle: trackerCategory)
+                checkFieldsToUpdateCreateButton()
+            case 1:
+                trackerWeekShedule.removeAll(keepingCapacity: true)
+                let sheduleVC = SheduleViewController(delegate: self)
+                present(sheduleVC, animated: true)
+            default:
+                break
+            }
+        } else if collectionView == emojiCollectionView {
+            let cell = collectionView.cellForItem(at: indexPath) as? EmojiCollectionViewCell
+            guard let cell else { return }
+            
+            cell.isCellPressed(true)
+            trackerEmoji = cell.getTitleLabel()
+            checkFieldsToUpdateCreateButton()
+        } else if collectionView == colorCollectionView {
+            let cell = collectionView.cellForItem(at: indexPath) as? ColorCollectionViewCell
+            guard let cell else { return }
+            
+            cell.isCellPressed(true)
+            trackerColor = cell.getColor()
+            checkFieldsToUpdateCreateButton()
+        }
+    }
+    
+    func collectionView(
+        _ collectionView: UICollectionView,
+        didDeselectItemAt indexPath: IndexPath
+    ) {
+        if collectionView == emojiCollectionView {
+            let cell = collectionView.cellForItem(at: indexPath) as? EmojiCollectionViewCell
+            guard let cell else { return }
+            
+            cell.isCellPressed(false)
+        } else if collectionView == colorCollectionView {
+            let cell = collectionView.cellForItem(at: indexPath) as? ColorCollectionViewCell
+            guard let cell else { return }
+            
+            cell.isCellPressed(false)
+        }
     }
 }

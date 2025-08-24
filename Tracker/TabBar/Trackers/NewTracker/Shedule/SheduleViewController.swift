@@ -19,7 +19,7 @@ final class SheduleViewController: UIViewController {
     ]
     private let cellHeight = 75
     
-    let scrollView = UIScrollView()
+    private let scrollView = UIScrollView()
     
     private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -78,11 +78,12 @@ final class SheduleViewController: UIViewController {
         super.viewDidLoad()
         scrollView.isScrollEnabled = true
         scrollView.showsVerticalScrollIndicator = false
+        
         setupScrollView()
         addUIElements()
     }
     
-    // MARK: - Private Properties
+    // MARK: - Private Methods
     private func setupScrollView() {
         view.backgroundColor = UIColor(resource: .ypWhite)
         
