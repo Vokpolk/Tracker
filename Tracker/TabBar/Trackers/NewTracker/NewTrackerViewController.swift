@@ -301,7 +301,7 @@ final class NewTrackerViewController: UIViewController {
         return Tracker(
             id: NewTrackerViewController.trackerId,
             name: trackerTitle ?? "",
-            color: trackerColor ?? UIColor(resource: .ypWhite),
+            color: trackerColor ?? UIColor.clear,
             emoji: trackerEmoji ?? "",
             weekDays: weekDays
         )
@@ -459,7 +459,8 @@ extension NewTrackerViewController: UICollectionViewDataSource {
         viewForSupplementaryElementOfKind kind: String,
         at indexPath: IndexPath
     ) -> UICollectionReusableView {
-        if collectionView == emojiCollectionView {
+        switch collectionView {
+        case self.emojiCollectionView:
             var id: String
             switch kind {
             case UICollectionView.elementKindSectionHeader:
@@ -480,7 +481,7 @@ extension NewTrackerViewController: UICollectionViewDataSource {
             }
             view.titleLabel.text = "Emoji"
             return view
-        } else if collectionView == colorCollectionView {
+        case self.colorCollectionView:
             var id: String
             switch kind {
             case UICollectionView.elementKindSectionHeader:
@@ -501,8 +502,7 @@ extension NewTrackerViewController: UICollectionViewDataSource {
             }
             view.titleLabel.text = "Цвет"
             return view
-        }
-        else {
+        default:
             return UICollectionReusableView()
         }
     }
@@ -527,11 +527,16 @@ extension NewTrackerViewController: UICollectionViewDelegateFlowLayout {
         sizeForItemAt indexPath: IndexPath
     ) -> CGSize {
         if collectionView == self.collectionView {
-            return CGSize(width: collectionView.bounds.width, height: 75)
-        } else {
+            let collectionHeight: CGFloat = 75
             return CGSize(
-                width: collectionView.bounds.width / 6 - 5,
-                height: collectionView.bounds.width / 6 - 5
+                width: collectionView.bounds.width,
+                height: collectionHeight
+            )
+        } else {
+            let collectionSize = collectionView.bounds.width / 6 - 5
+            return CGSize(
+                width: collectionSize,
+                height: collectionSize
             )
         }
     }
@@ -589,7 +594,8 @@ extension NewTrackerViewController: UICollectionViewDelegateFlowLayout {
         _ collectionView: UICollectionView,
         didSelectItemAt indexPath: IndexPath
     ) {
-        if collectionView == self.collectionView {
+        switch collectionView {
+        case self.collectionView:
             switch indexPath.row {
             case 0:
                 print("Заглушка категории")
@@ -604,20 +610,22 @@ extension NewTrackerViewController: UICollectionViewDelegateFlowLayout {
             default:
                 break
             }
-        } else if collectionView == emojiCollectionView {
+        case self.emojiCollectionView:
             let cell = collectionView.cellForItem(at: indexPath) as? EmojiCollectionViewCell
             guard let cell else { return }
             
             cell.isCellPressed(true)
             trackerEmoji = cell.getTitleLabel()
             checkFieldsToUpdateCreateButton()
-        } else if collectionView == colorCollectionView {
+        case self.colorCollectionView:
             let cell = collectionView.cellForItem(at: indexPath) as? ColorCollectionViewCell
             guard let cell else { return }
             
             cell.isCellPressed(true)
             trackerColor = cell.getColor()
             checkFieldsToUpdateCreateButton()
+        default:
+            print("Выделение не той ячейки")
         }
     }
     

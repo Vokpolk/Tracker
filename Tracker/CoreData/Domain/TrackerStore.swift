@@ -1,4 +1,3 @@
-import UIKit
 import CoreData
 
 extension TrackerCoreData {
@@ -6,8 +5,8 @@ extension TrackerCoreData {
         Tracker(
             id: UInt(id),
             name: name ?? "",
-            color: color as? UIColor ?? UIColor(resource: .ypWhite),
-            emoji: emoji ?? "",
+            color: color,
+            emoji: emoji ?? "💔",
             weekDays: WeekBitmask.maskToDays(weekDays)
         )
     }

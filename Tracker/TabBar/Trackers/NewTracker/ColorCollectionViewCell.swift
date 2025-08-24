@@ -61,11 +61,7 @@ final class ColorCollectionViewCell: UICollectionViewCell {
     }
     
     func getColor() -> UIColor? {
-        if isPressed {
-            return colorView.backgroundColor
-        } else {
-            return nil
-        }
+        isPressed ? colorView.backgroundColor : nil
     }
 }
 

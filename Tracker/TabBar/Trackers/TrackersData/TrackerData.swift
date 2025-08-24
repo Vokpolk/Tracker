@@ -16,4 +16,18 @@ struct Tracker {
     let color: UIColor
     let emoji: String
     let weekDays: [WeekDay]
+    
+    init(
+        id: UInt,
+        name: String,
+        color: NSObject?,
+        emoji: String,
+        weekDays: [WeekDay]
+    ) {
+        self.id = id
+        self.name = name
+        self.color = (color as? UIColor) ?? UIColor.clear
+        self.emoji = emoji
+        self.weekDays = weekDays
+    }
 }

@@ -56,11 +56,7 @@ final class EmojiCollectionViewCell: UICollectionViewCell {
     }
     
     func getTitleLabel() -> String? {
-        if isPressed {
-            return titleLabel.text
-        } else {
-            return nil
-        }
+        isPressed ? titleLabel.text : nil
     }
 }
 

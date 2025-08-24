@@ -424,7 +424,7 @@ extension TrackersViewController: TrackersDelegate {
         do {
             try trackerStore.addNewTracker(tracker)
         } catch {
-            fatalError("Не получилось создать Tracker в БД")
+            assertionFailure("Не получилось создать Tracker в БД")
         }
     }
 }
