@@ -141,12 +141,8 @@ final class TrackersViewController: UIViewController {
         trackerRecordStore.delegate = self
         
         completedTrackers = trackerRecordStore.trackerRecords
-        categories.append(
-            TrackerCategory(
-                title: TrackerCategories.important,
-                trackers: trackerStore.trackers
-            )
-        )
+        categories = trackerCategoryStore.trackerCategories
+        
         dateChanged()
         collectionView.reloadData()
     }
@@ -260,6 +256,10 @@ final class TrackersViewController: UIViewController {
 
 // MARK: - UICollectionViewDataSource
 extension TrackersViewController: UICollectionViewDataSource {
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        visibleCategories.count
+    }
+    
     func collectionView(
         _ collectionView: UICollectionView,
         numberOfItemsInSection section: Int
@@ -269,10 +269,13 @@ extension TrackersViewController: UICollectionViewDataSource {
             return 0
         }
         collectionView.isHidden = false
-        return visibleCategories[0].trackers.count
+        return visibleCategories[section].trackers.count
     }
     
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        cellForItemAt indexPath: IndexPath
+    ) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: "cell",
             for: indexPath
@@ -280,7 +283,7 @@ extension TrackersViewController: UICollectionViewDataSource {
             return UICollectionViewCell()
         }
         
-        let tracker = visibleCategories[0].trackers[indexPath.row]
+        let tracker = visibleCategories[indexPath.section].trackers[indexPath.row]
         cell.delegate = self
         
         let isCompletedToday = isTrackerCompletedToday(id: tracker.id)
@@ -321,7 +324,7 @@ extension TrackersViewController: UICollectionViewDataSource {
         guard let view else {
             return UICollectionReusableView()
         }
-        view.titleLabel.text = TrackerCategories.important
+        view.titleLabel.text = visibleCategories[indexPath.section].title// TrackerCategories.important
         return view
     }
     
@@ -418,11 +421,15 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
 
 // MARK: - TrackersDelegate
 extension TrackersViewController: TrackersDelegate {
-    func createTracker(_ tracker: Tracker) {
-        categories[0].trackers.append(tracker)
+    func createTracker(_ tracker: Tracker, with category: String) {
+        categories = trackerCategoryStore.trackerCategories
+        if let index = categories.firstIndex(where: { $0.title == category }) {
+            categories[index].trackers.append(tracker)
+        }
+        
         dateChanged()
         do {
-            try trackerStore.addNewTracker(tracker)
+            try trackerStore.addNewTracker(tracker, to: category)
         } catch {
             assertionFailure("Не получилось создать Tracker в БД")
         }

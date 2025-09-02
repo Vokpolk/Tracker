@@ -14,10 +14,28 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     ) {
         guard let windowScene = scene as? UIWindowScene else { return }
         let window = UIWindow(windowScene: windowScene)
+        self.window = window
         
-        trackerStore = TrackerStore(context: persistentContainer.viewContext)
-        trackerRecordStore = TrackerRecordStore(context: persistentContainer.viewContext)
-        trackerCategoryStore = TrackerCategoryStore(context: persistentContainer.viewContext)
+        trackerStore = (UIApplication.shared.delegate as! AppDelegate).trackerStore
+        trackerRecordStore = (UIApplication.shared.delegate as! AppDelegate).trackerRecordStore
+        trackerCategoryStore = (UIApplication.shared.delegate as! AppDelegate).trackerCategoryStore
+        
+        UserDefaults.standard.bool(forKey: OnboardingUserDefaults.shown) ? showTrackers() : showOnboarding()
+        
+        window.makeKeyAndVisible()
+    }
+    
+    private func showOnboarding() {
+        let onboardingVC = OnboardingViewController()
+        
+        onboardingVC.showTrackers = { [weak self] in
+            self?.showTrackers()
+            UserDefaults.standard.set(true, forKey: OnboardingUserDefaults.shown)
+        }
+        window?.rootViewController = onboardingVC
+    }
+    
+    private func showTrackers() {
         let tabBarController = TabBarController(
             trackerStore: trackerStore,
             trackerRecordStore: trackerRecordStore,
@@ -25,35 +43,14 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         )
         tabBarController.tabBar.isTranslucent = false
         tabBarController.tabBar.backgroundColor = UIColor(resource: .ypWhite)
-        window.rootViewController = tabBarController
         
-        
-        self.window = window
-        window.makeKeyAndVisible()
-        
-    }
-    
-    // MARK: - Core Data stack
-    lazy var persistentContainer: NSPersistentContainer = {
-        let container = NSPersistentContainer(name: "Model")
-        container.loadPersistentStores(completionHandler: { (storeDescription, error) in
-            if let error = error as NSError? {
-                fatalError("Unresolved error \(error), \(error.userInfo)")
-            }
-        })
-        return container
-    }()
-    
-    // MARK: - Core Data Saving support
-    func saveContext() {
-        let context = persistentContainer.viewContext
-        if context.hasChanges {
-            do {
-                try context.save()
-            } catch {
-                let error = error as NSError
-                fatalError("Unresolved error \(error), \(error.userInfo)")
-            }
+        tabBarController.view.alpha = 0
+        UIView.transition(
+            with: tabBarController.view,
+            duration: 0.25
+        ) {
+            self.window?.rootViewController = tabBarController
+            tabBarController.view.alpha = 1
         }
     }
 }

@@ -30,7 +30,7 @@ final class TrackerStore: NSObject {
         setupFetchedResultsController()
     }
     
-    func addNewTracker(_ tracker: Tracker) throws {
+    func addNewTracker(_ tracker: Tracker, to categoryName: String) throws {
         let trackerCoreData = TrackerCoreData(context: context)
         trackerCoreData.id = Int32(tracker.id)
         trackerCoreData.name = tracker.name
@@ -38,9 +38,18 @@ final class TrackerStore: NSObject {
         trackerCoreData.emoji = tracker.emoji
         trackerCoreData.weekDays = WeekBitmask.daysToMask(tracker.weekDays)
         
-        let category = TrackerCategoryCoreData(context: context)
-        category.title = TrackerCategories.important
-        trackerCoreData.category = category
+        let categoryRequest = TrackerCategoryCoreData.fetchRequest()
+        categoryRequest.predicate = NSPredicate(format: "title == %@", categoryName)
+        categoryRequest.fetchLimit = 1
+        
+        var categoryCD: TrackerCategoryCoreData?
+        if let category = try context.fetch(categoryRequest).first {
+            categoryCD = category
+        } else {
+            categoryCD = TrackerCategoryCoreData(context: context)
+            categoryCD?.title = categoryName
+        }
+        trackerCoreData.category = categoryCD
         
         saveContext()
     }
