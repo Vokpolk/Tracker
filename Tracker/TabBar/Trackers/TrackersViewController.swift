@@ -173,7 +173,9 @@ final class TrackersViewController: UIViewController {
                 trackers: trackers
             )
         }
-        
+        if visibleCategories.isEmpty {
+            collectionView.isHidden = true
+        }
         collectionView.reloadData()
     }
     
