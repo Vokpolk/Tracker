@@ -33,6 +33,11 @@ final class NewCategoryViewController: UIViewController {
             action: #selector(Self.textFieldDidReturn),
             for: .editingDidEnd
         )
+        enterTrackerName.addTarget(
+            self,
+            action: #selector(Self.isCategoryExists),
+            for: .editingChanged
+        )
         return enterTrackerName
     }()
     
@@ -50,6 +55,16 @@ final class NewCategoryViewController: UIViewController {
             for: .touchUpInside
         )
         return button
+    }()
+    
+    private lazy var isExistsLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Категория существует!"
+        label.textColor = UIColor(resource: .ypRed)
+        label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        label.textAlignment = .center
+        label.isHidden = true
+        return label
     }()
     
     // MARK: - LifeCycles
@@ -80,6 +95,7 @@ final class NewCategoryViewController: UIViewController {
         [
             categoryLabel,
             enterCategoryName,
+            isExistsLabel,
             addCategoryButton
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
@@ -95,6 +111,9 @@ final class NewCategoryViewController: UIViewController {
             enterCategoryName.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             enterCategoryName.heightAnchor.constraint(equalToConstant: 75),
             
+            isExistsLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            isExistsLabel.topAnchor.constraint(equalTo: enterCategoryName.bottomAnchor, constant: 25),
+            
             addCategoryButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             addCategoryButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             addCategoryButton.heightAnchor.constraint(equalToConstant: 60),
@@ -106,7 +125,7 @@ final class NewCategoryViewController: UIViewController {
     private func handleEnterPressed(_ categoryName: String?) {
         guard let categoryName else { return }
         print(categoryName)
-        if !categoryName.isEmpty {
+        if !categoryName.isEmpty && isExistsLabel.isHidden {
             category = categoryName
             addCategoryButton.backgroundColor = UIColor(resource: .ypBlack)
             addCategoryButton.isEnabled = true
@@ -125,6 +144,19 @@ final class NewCategoryViewController: UIViewController {
     @objc func textFieldDidReturn(_ textField: UITextField) {
         enterCategoryName.resignFirstResponder()
         handleEnterPressed(textField.text)
+    }
+    
+    @objc func isCategoryExists(_ textField: UITextField) {
+        guard let viewModel else { return }
+        if viewModel.isCategoryExists(textField.text ?? "") {
+            isExistsLabel.isHidden = false
+            addCategoryButton.isEnabled = false
+            addCategoryButton.backgroundColor = UIColor(resource: .ypGray)
+        } else {
+            isExistsLabel.isHidden = true
+            addCategoryButton.isEnabled = true
+            addCategoryButton.backgroundColor = UIColor(resource: .ypBlack)
+        }
     }
     
     private func hideKeyboardEvent() {

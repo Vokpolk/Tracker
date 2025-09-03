@@ -7,14 +7,14 @@ enum OnboardingUserDefaults {
 final class OnboardingViewController: UIPageViewController {
     var showTrackers: (() -> Void)?
     
-    lazy var pages: [UIViewController] = {
+    private lazy var pages: [UIViewController] = {
         let left = LeftViewController()
         let right = RightViewController()
         
         return [left, right]
     }()
     
-    lazy var pageControl: UIPageControl = {
+    private lazy var pageControl: UIPageControl = {
         let pageControl = UIPageControl()
         pageControl.numberOfPages = pages.count
         pageControl.currentPage = 0

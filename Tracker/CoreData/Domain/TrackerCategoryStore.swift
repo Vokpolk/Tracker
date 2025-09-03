@@ -37,6 +37,36 @@ final class TrackerCategoryStore: NSObject {
         return result
     }
     
+    func isCategoryExists(with title: String) -> Bool {
+        let fetchRequest = TrackerCategoryCoreData.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "title == %@", title)
+        do {
+            let count = try context.count(for: fetchRequest)
+            return count > 0
+        } catch {
+            print("Ошибка при проверке существования категории!")
+            return false
+        }
+    }
+    
+    func deleteCategory(with title: String) -> Bool {
+        let fetchRequest = TrackerCategoryCoreData.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "title == %@", title)
+        fetchRequest.fetchLimit = 1
+        do {
+            let results = try context.fetch(fetchRequest)
+            if let itemToDelete = results.first {
+                context.delete(itemToDelete)
+                saveContext()
+                return true
+            }
+            return false
+        } catch {
+            print("Ошибка при удалении категории!")
+            return false
+        }
+    }
+    
     private func saveContext() {
         if context.hasChanges {
             do {

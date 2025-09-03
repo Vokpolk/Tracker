@@ -24,4 +24,8 @@ final class CategoryViewModel {
     func getCategories() -> [TrackerCategory] {
         model.trackerCategories
     }
+    
+    func isCategoryExists(_ name: String) ->Bool {
+        model.isCategoryExists(with: name)
+    }
 }
