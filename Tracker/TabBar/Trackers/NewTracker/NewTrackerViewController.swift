@@ -271,7 +271,8 @@ final class NewTrackerViewController: UIViewController {
     @objc private func createButtonTap() {
         print("create button tap")
         if isCreateTrackerEnabled {
-            delegate?.createTracker(makeTracker())
+            guard let trackerCategory else { return }
+            delegate?.createTracker(makeTracker(), with: trackerCategory)
             dismiss(animated: true, completion: nil)
         }
     }
@@ -600,7 +601,10 @@ extension NewTrackerViewController: UICollectionViewDelegateFlowLayout {
             case 0:
                 print("Заглушка категории")
                 let cell = collectionView.cellForItem(at: indexPath) as? NewTrackerCollectionViewCell
-                trackerCategory = TrackerCategories.important
+                let categoryVC = CategoryViewController()
+                categoryVC.delegate = self
+                present(categoryVC, animated: true)
+                guard let trackerCategory else { return }
                 cell?.configure(title: items[indexPath.row], subtitle: trackerCategory)
                 checkFieldsToUpdateCreateButton()
             case 1:
@@ -644,5 +648,13 @@ extension NewTrackerViewController: UICollectionViewDelegateFlowLayout {
             
             cell.isCellPressed(false)
         }
+    }
+}
+
+
+extension NewTrackerViewController: CategoryDelegate {
+    func newCategoryName(_ name: String) {
+        trackerCategory = name
+        collectionView.reloadData()
     }
 }

@@ -1,5 +1,5 @@
 enum TrackerCategories {
-    static let important = "Важное"
+    static let important = "ОченьВажное"
 }
 
 struct TrackerCategory {
