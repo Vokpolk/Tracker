@@ -53,7 +53,7 @@ final class SheduleViewController: UIViewController {
         button.setTitle(NSLocalizedString("ready", comment: "")/*"Готово"*/, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.backgroundColor = UIColor(resource: .ypBlack)
-        button.setTitleColor(.white, for: .normal)
+        button.setTitleColor(.ypWhite, for: .normal)
         button.layer.cornerRadius = 16
         button.addTarget(
             self,

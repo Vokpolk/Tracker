@@ -58,7 +58,7 @@ final class FilterViewController: UIViewController {
     
     // MARK: - LifeCycles
     override func viewDidLoad() {
-        view.backgroundColor = .white
+        view.backgroundColor = .ypWhite
         addUIElements()
     }
     
