@@ -19,7 +19,7 @@ final class CategoryViewController: UIViewController {
     
     private lazy var categoryLabel: UILabel = {
         let label = UILabel()
-        label.text = "Категория"
+        label.text = NSLocalizedString("category", comment: "")//"Категория"
         label.textColor = UIColor(resource: .ypBlack)
         label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         label.textAlignment = .center
@@ -53,7 +53,8 @@ final class CategoryViewController: UIViewController {
     
     private lazy var label: UILabel = {
         let label = UILabel()
-        label.text = "Привычки и события можно\nобъединить по смыслу"
+//        label.text = "Привычки и события можно\nобъединить по смыслу"
+        label.text = NSLocalizedString("habits and events can be combined in meaning", comment: "")
         label.textColor = UIColor(resource: .ypBlack)
         label.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         label.textAlignment = .center
@@ -63,7 +64,8 @@ final class CategoryViewController: UIViewController {
     
     private lazy var addCategoryButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Добавить категорию", for: .normal)
+//        button.setTitle("Добавить категорию", for: .normal)
+        button.setTitle(NSLocalizedString("add category", comment: ""), for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.backgroundColor = UIColor(resource: .ypBlack)
         button.setTitleColor(.white, for: .normal)

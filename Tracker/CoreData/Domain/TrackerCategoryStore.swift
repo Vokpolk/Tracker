@@ -49,6 +49,27 @@ final class TrackerCategoryStore: NSObject {
         }
     }
     
+//    func addTrackerToCategory(id: UInt32, category: String) {
+//        let fetchRequest = TrackerCategoryCoreData.fetchRequest()
+//        fetchRequest.predicate = NSPredicate(format: "title == %@", category)
+//        fetchRequest.fetchLimit = 1
+//        do {
+//            if let result = try context.fetch(fetchRequest).first {
+//                result.trackers = 
+//            if let itemToDelete = results.first {
+//                context.delete(itemToDelete)
+//                saveContext()
+//            }
+//        } catch {
+//            print("Ошибка при удалении категории!")
+//        }
+//    }
+//    
+//    func deleteTrackerFromCategory(id: UInt32) {
+//        let fetchRequest = TrackerCategoryCoreData.fetchRequest()
+//        fetchRequest.predicate = NSPredicate(format: "id == %@", id as CVarArg)
+//    }
+    
     func deleteCategory(with title: String) -> Bool {
         let fetchRequest = TrackerCategoryCoreData.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "title == %@", title)

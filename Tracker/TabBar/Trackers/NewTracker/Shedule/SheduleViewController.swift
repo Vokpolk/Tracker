@@ -9,13 +9,13 @@ final class SheduleViewController: UIViewController {
     
     // MARK: - Private Properties
     private var data: [WeekShedule] = [
-        WeekShedule(title: "Понедельник", isOn: false),
-        WeekShedule(title: "Вторник", isOn: false),
-        WeekShedule(title: "Среда", isOn: false),
-        WeekShedule(title: "Четверг", isOn: false),
-        WeekShedule(title: "Пятница", isOn: false),
-        WeekShedule(title: "Суббота", isOn: false),
-        WeekShedule(title: "Воскресенье", isOn: false)
+        WeekShedule(title: NSLocalizedString("monday", comment: ""), isOn: false),
+        WeekShedule(title: NSLocalizedString("tuesday", comment: ""), isOn: false),
+        WeekShedule(title: NSLocalizedString("wednesday", comment: ""), isOn: false),
+        WeekShedule(title: NSLocalizedString("thursday", comment: ""), isOn: false),
+        WeekShedule(title: NSLocalizedString("friday", comment: ""), isOn: false),
+        WeekShedule(title: NSLocalizedString("saturday", comment: ""), isOn: false),
+        WeekShedule(title: NSLocalizedString("sunday", comment: ""), isOn: false)
     ]
     private let cellHeight = 75
     
@@ -41,7 +41,7 @@ final class SheduleViewController: UIViewController {
     
     private lazy var sheduleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Расписание"
+        label.text = NSLocalizedString("shedule", comment: "")//"Расписание"
         label.textColor = UIColor(resource: .ypBlack)
         label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         label.textAlignment = .center
@@ -50,7 +50,7 @@ final class SheduleViewController: UIViewController {
     
     private lazy var readyButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Готово", for: .normal)
+        button.setTitle(NSLocalizedString("ready", comment: "")/*"Готово"*/, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.backgroundColor = UIColor(resource: .ypBlack)
         button.setTitleColor(.white, for: .normal)
