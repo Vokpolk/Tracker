@@ -10,7 +10,7 @@ final class RightViewController: UIViewController {
     
     private lazy var label: UILabel = {
         let label = UILabel()
-        label.text = "Даже если это не литры воды и йога"
+        label.text = NSLocalizedString("even if it's not liters of water and yoga", comment: "")//"Даже если это не литры воды и йога"
         label.textColor = UIColor(resource: .ypBlack)
         label.font = UIFont.systemFont(ofSize: 32, weight: .bold)
         label.numberOfLines = 0

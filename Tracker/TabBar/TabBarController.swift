@@ -14,14 +14,14 @@ final class TabBarController: UITabBarController {
             trackerCategoryStore: trackerCategoryStore
         )
         trackersViewController.tabBarItem = UITabBarItem(
-            title: "Трекеры",
+            title: NSLocalizedString("trackers", comment: ""),//"Трекеры",
             image: UIImage(resource: .tabBarTracker),
             selectedImage: nil
         )
         
         let statisticViewController = StatisticViewController()
         statisticViewController.tabBarItem = UITabBarItem(
-            title: "Статистика",
+            title: NSLocalizedString("statistics", comment: ""),//"Статистика",
             image: UIImage(resource: .tabBarStat),
             selectedImage: nil
         )
@@ -35,7 +35,7 @@ final class TabBarController: UITabBarController {
     
     override func viewDidLoad() {
         self.tabBar.addFullBorder()
-        
+        self.tabBar.backgroundColor = .ypWhite
         
     }
 }

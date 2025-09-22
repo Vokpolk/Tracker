@@ -12,11 +12,11 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     
     // MARK: - Private Properties
     private var color = UIColor()
-    private let cardBackground = UIView()
-    private let emojiBackground = UIView()
-    private let emojiLabel = UILabel()
-    private let trackerName = UILabel()
-    private let daysCount = UILabel()
+    private(set) var cardBackground = UIView()
+    private(set) var emojiBackground = UIView()
+    private(set) var emojiLabel = UILabel()
+    private(set) var trackerName = UILabel()
+    private(set) var daysCount = UILabel()
     private let button = UIButton(type: .custom)
     
     private var isCompletedToday: Bool = false
@@ -77,9 +77,13 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         
         daysCount.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         daysCount.textAlignment = .left
-        let wordDay = pluralizeDays(completedDays)
+        
+        let wordDay = String.localizedStringWithFormat(
+            NSLocalizedString("numberOfDays", comment: ""),
+            completedDays
+        )
         daysCount.text = wordDay
-        daysCount.textColor = .black
+        daysCount.textColor = UIColor(resource: .ypBlack)
         
         self.weekDays = weekDays
         
@@ -98,6 +102,16 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     }
     
     weak var delegate: TrackerCellDelegate?
+    
+    func getTracker() -> Tracker {
+        Tracker(
+            id: trackerId ?? 0,
+            name: trackerName.text ?? "",
+            color: color,
+            emoji: emojiLabel.text ?? "",
+            weekDays: weekDays
+        )
+    }
     
     // MARK: - Private Methods
     private func initConstraints() {
@@ -146,25 +160,6 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
             delegate?.uncompleteTracker(id: trackerId, at: indexPath)
         } else {
             delegate?.completeTracker(id: trackerId, at: indexPath)
-        }
-    }
-    
-    private func pluralizeDays(_ day: Int) -> String {
-        let absDay = abs(day)
-        let lastTwo = absDay % 100
-        let lastOne = absDay % 10
-        
-        if lastTwo >= 11 && lastTwo <= 19 {
-            return "\(day) дней"
-        } else {
-            switch lastOne {
-            case 1:
-                return "\(day) день"
-            case 2, 3, 4:
-                return "\(day) дня"
-            default:
-                return "\(day) дней"
-            }
         }
     }
 }

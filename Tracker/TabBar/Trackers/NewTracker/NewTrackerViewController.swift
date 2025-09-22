@@ -6,6 +6,8 @@ final class NewTrackerViewController: UIViewController {
     // MARK: - Private Properties
     static var trackerId: UInt = 0
     
+    private var tracker: Tracker?
+    
     private let scrollView: UIScrollView = UIScrollView()
     private var trackerTitle: String? = nil
     private var trackerCategory: String? = nil
@@ -15,8 +17,8 @@ final class NewTrackerViewController: UIViewController {
     private var isCreateTrackerEnabled: Bool = false
     
     private let items = [
-        "Категория",
-        "Расписание"
+        NSLocalizedString("category", comment: ""),//"Категория",
+        NSLocalizedString("shedule", comment: "")//"Расписание"
     ]
     private let cellHeight = 75
     
@@ -88,18 +90,32 @@ final class NewTrackerViewController: UIViewController {
         return collectionView
     }()
     
-    private lazy var newHabitLabel: UILabel = {
+    private var newHabitLabel: UILabel = {
         let label = UILabel()
-        label.text = "Новая привычка"
+        label.text = NSLocalizedString("new habit", comment: "")//"Новая привычка"
         label.textColor = UIColor(resource: .ypBlack)
         label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         label.textAlignment = .center
         return label
     }()
     
+    private var completedDays: UInt = 0
+    
+    private var completedDaysLabel: UILabel = {
+        let label = UILabel()
+        label.text = String.localizedStringWithFormat(
+            NSLocalizedString("numberOfDays", comment: ""),
+            0
+        )
+        label.textColor = UIColor(resource: .ypBlack)
+        label.font = UIFont.systemFont(ofSize: 32, weight: .bold)
+        label.textAlignment = .center
+        return label
+    }()
+    
     private lazy var enterTrackerName: UITextField = {
         let enterTrackerName = UITextField()
-        enterTrackerName.placeholder = "Введите название трекера"
+        enterTrackerName.placeholder = NSLocalizedString("input tracker name", comment: "")//"Введите название трекера"
         enterTrackerName.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 16, height: enterTrackerName.frame.height))
         enterTrackerName.leftViewMode = .always
         enterTrackerName.backgroundColor = UIColor(resource: .ypBackground)
@@ -120,7 +136,7 @@ final class NewTrackerViewController: UIViewController {
     
     private lazy var cancelButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Отменить", for: .normal)
+        button.setTitle(NSLocalizedString("cancel", comment: ""), for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.backgroundColor = UIColor(resource: .ypWhite)
         button.layer.borderWidth = 1
@@ -138,7 +154,7 @@ final class NewTrackerViewController: UIViewController {
     
     private lazy var createButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Создать", for: .normal)
+        button.setTitle(NSLocalizedString("create", comment: ""), for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.backgroundColor = UIColor(resource: .ypGray)
         button.setTitleColor(.white, for: .normal)
@@ -178,6 +194,34 @@ final class NewTrackerViewController: UIViewController {
     // MARK: - LifeCycles
     override func viewDidLoad() {
         super.viewDidLoad()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        // Альтернативно можно выбрать после появления экрана
+        if tracker != nil {
+            selectInitialItem()
+        }
+    }
+    
+    // MARK: - Public methods
+    func configureHabit(
+        _ tracker: Tracker? = nil,
+        _ completedTrackers: Int? = nil,
+        _ category: String? = nil
+    ) {
+        self.tracker = tracker
+        self.trackerCategory = category
+        self.completedDaysLabel.text = String.localizedStringWithFormat(
+            NSLocalizedString("numberOfDays", comment: ""),
+            completedTrackers ?? 0
+        )
+        
+        if tracker != nil {
+            isCreateTrackerEnabled = true
+        }
+        self.enterTrackerName.text = tracker?.name
         scrollView.isScrollEnabled = true
         scrollView.showsVerticalScrollIndicator = false
         
@@ -201,62 +245,164 @@ final class NewTrackerViewController: UIViewController {
         ])
     }
     
+    private func selectInitialItem() {
+        guard let tracker else { return }
+        
+        guard let emojiIndex = emojies.firstIndex(where: { emoji in
+            emoji == tracker.emoji
+        }) else { return }
+        
+        guard let colorIndex = colors.firstIndex(where: { color in
+            return color.cgColor.components == tracker.color.cgColor.components
+        }) else { return }
+        
+        
+        let emojiIndexPath = IndexPath(item: emojiIndex, section: 0)
+        let colorIndexPath = IndexPath(item: colorIndex, section: 0)
+        
+        emojiCollectionView.selectItem(
+            at: emojiIndexPath,
+            animated: false,
+            scrollPosition: .centeredHorizontally
+        )
+        
+        emojiCollectionView.delegate?.collectionView?(
+            emojiCollectionView,
+            didSelectItemAt: emojiIndexPath
+        )
+        
+        colorCollectionView.selectItem(
+            at: colorIndexPath,
+            animated: false,
+            scrollPosition: .centeredHorizontally
+        )
+        
+        colorCollectionView.delegate?.collectionView?(
+            colorCollectionView,
+            didSelectItemAt: colorIndexPath
+        )
+    }
+    
     private func initUIObjects() {
         view.backgroundColor = UIColor(resource: .ypWhite)
-        stackView.addArrangedSubview(cancelButton)
-        stackView.addArrangedSubview(createButton)
-        [
-            newHabitLabel,
-            enterTrackerName,
-            collectionView,
-            emojiCollectionView,
-            colorCollectionView,
-            stackView
-        ].forEach {
-            scrollView.addSubview($0)
-            $0.translatesAutoresizingMaskIntoConstraints = false
-        }
-        
-        NSLayoutConstraint.activate([
-            newHabitLabel.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
-            newHabitLabel.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: 25),
+        if tracker == nil {
+            stackView.addArrangedSubview(cancelButton)
+            stackView.addArrangedSubview(createButton)
+            [
+                newHabitLabel,
+                enterTrackerName,
+                collectionView,
+                emojiCollectionView,
+                colorCollectionView,
+                stackView
+            ].forEach {
+                scrollView.addSubview($0)
+                $0.translatesAutoresizingMaskIntoConstraints = false
+            }
             
-            enterTrackerName.topAnchor.constraint(equalTo: newHabitLabel.bottomAnchor, constant: 38),
-            enterTrackerName.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 16),
-            enterTrackerName.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: -16),
-            enterTrackerName.heightAnchor.constraint(equalToConstant: 75),
-            enterTrackerName.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
+            NSLayoutConstraint.activate([
+                newHabitLabel.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
+                newHabitLabel.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: 25),
+                
+                enterTrackerName.topAnchor.constraint(equalTo: newHabitLabel.bottomAnchor, constant: 38),
+                enterTrackerName.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 16),
+                enterTrackerName.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: -16),
+                enterTrackerName.heightAnchor.constraint(equalToConstant: 75),
+                enterTrackerName.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
+                
+                collectionView.topAnchor.constraint(equalTo: enterTrackerName.bottomAnchor, constant: 24),
+                collectionView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 16),
+                collectionView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant:  -16),
+                collectionView.bottomAnchor.constraint(equalTo: collectionView.topAnchor, constant: CGFloat(cellHeight * items.count) - 1),
+                collectionView.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
+                
+                emojiCollectionView.topAnchor.constraint(equalTo: collectionView.bottomAnchor, constant: 32),
+                emojiCollectionView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 19),
+                emojiCollectionView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant:  -19),
+                emojiCollectionView.bottomAnchor.constraint(equalTo: emojiCollectionView.topAnchor, constant: CGFloat(220)),
+                emojiCollectionView.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
+                
+                colorCollectionView.topAnchor.constraint(equalTo: emojiCollectionView.bottomAnchor, constant: 16),
+                colorCollectionView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 19),
+                colorCollectionView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant:  -19),
+                colorCollectionView.bottomAnchor.constraint(equalTo: colorCollectionView.topAnchor, constant: CGFloat(220)),
+                colorCollectionView.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
+                
+                stackView.topAnchor.constraint(equalTo: colorCollectionView.bottomAnchor, constant: 10),
+                stackView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 20),
+                stackView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: -20),
+                stackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+                stackView.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
+                
+                cancelButton.heightAnchor.constraint(equalToConstant: 60),
+                createButton.heightAnchor.constraint(equalToConstant: 60)
+            ])
+            [collectionView, emojiCollectionView, colorCollectionView].forEach {
+                $0.dataSource = self
+                $0.delegate = self
+            }
+        } else {
+            newHabitLabel.text = NSLocalizedString("edit habit", comment: "")
+            createButton.setTitle(NSLocalizedString("save", comment: ""), for: .normal)
+            stackView.addArrangedSubview(cancelButton)
+            stackView.addArrangedSubview(createButton)
+            [
+                newHabitLabel,
+                completedDaysLabel,
+                enterTrackerName,
+                collectionView,
+                emojiCollectionView,
+                colorCollectionView,
+                stackView
+            ].forEach {
+                scrollView.addSubview($0)
+                $0.translatesAutoresizingMaskIntoConstraints = false
+            }
             
-            collectionView.topAnchor.constraint(equalTo: enterTrackerName.bottomAnchor, constant: 24),
-            collectionView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 16),
-            collectionView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant:  -16),
-            collectionView.bottomAnchor.constraint(equalTo: collectionView.topAnchor, constant: CGFloat(cellHeight * items.count) - 1),
-            collectionView.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
-            
-            emojiCollectionView.topAnchor.constraint(equalTo: collectionView.bottomAnchor, constant: 32),
-            emojiCollectionView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 19),
-            emojiCollectionView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant:  -19),
-            emojiCollectionView.bottomAnchor.constraint(equalTo: emojiCollectionView.topAnchor, constant: CGFloat(220)),
-            emojiCollectionView.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
-            
-            colorCollectionView.topAnchor.constraint(equalTo: emojiCollectionView.bottomAnchor, constant: 16),
-            colorCollectionView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 19),
-            colorCollectionView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant:  -19),
-            colorCollectionView.bottomAnchor.constraint(equalTo: colorCollectionView.topAnchor, constant: CGFloat(220)),
-            colorCollectionView.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
-            
-            stackView.topAnchor.constraint(equalTo: colorCollectionView.bottomAnchor, constant: 10),
-            stackView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 20),
-            stackView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: -20),
-            stackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
-            stackView.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
-            
-            cancelButton.heightAnchor.constraint(equalToConstant: 60),
-            createButton.heightAnchor.constraint(equalToConstant: 60)
-        ])
-        [collectionView, emojiCollectionView, colorCollectionView].forEach {
-            $0.dataSource = self
-            $0.delegate = self
+            NSLayoutConstraint.activate([
+                newHabitLabel.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
+                newHabitLabel.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: 25),
+                
+                completedDaysLabel.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
+                completedDaysLabel.topAnchor.constraint(equalTo: newHabitLabel.bottomAnchor, constant: 25),
+                
+                enterTrackerName.topAnchor.constraint(equalTo: completedDaysLabel.bottomAnchor, constant: 38),
+                enterTrackerName.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 16),
+                enterTrackerName.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: -16),
+                enterTrackerName.heightAnchor.constraint(equalToConstant: 75),
+                enterTrackerName.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
+                
+                collectionView.topAnchor.constraint(equalTo: enterTrackerName.bottomAnchor, constant: 24),
+                collectionView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 16),
+                collectionView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant:  -16),
+                collectionView.bottomAnchor.constraint(equalTo: collectionView.topAnchor, constant: CGFloat(cellHeight * items.count) - 1),
+                collectionView.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
+                
+                emojiCollectionView.topAnchor.constraint(equalTo: collectionView.bottomAnchor, constant: 32),
+                emojiCollectionView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 19),
+                emojiCollectionView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant:  -19),
+                emojiCollectionView.bottomAnchor.constraint(equalTo: emojiCollectionView.topAnchor, constant: CGFloat(220)),
+                emojiCollectionView.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
+                
+                colorCollectionView.topAnchor.constraint(equalTo: emojiCollectionView.bottomAnchor, constant: 16),
+                colorCollectionView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 19),
+                colorCollectionView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant:  -19),
+                colorCollectionView.bottomAnchor.constraint(equalTo: colorCollectionView.topAnchor, constant: CGFloat(220)),
+                colorCollectionView.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
+                
+                stackView.topAnchor.constraint(equalTo: colorCollectionView.bottomAnchor, constant: 10),
+                stackView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 20),
+                stackView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: -20),
+                stackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+                stackView.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
+                
+                cancelButton.heightAnchor.constraint(equalToConstant: 60),
+                createButton.heightAnchor.constraint(equalToConstant: 60)
+            ])
+            [collectionView, emojiCollectionView, colorCollectionView].forEach {
+                $0.dataSource = self
+                $0.delegate = self
+            }
         }
     }
     
@@ -272,11 +418,51 @@ final class NewTrackerViewController: UIViewController {
         print("create button tap")
         if isCreateTrackerEnabled {
             guard let trackerCategory else { return }
-            delegate?.createTracker(makeTracker(), with: trackerCategory)
+            if tracker != nil {
+                let editedTracker = editTracker()
+                guard let editedTracker else { return }
+                delegate?.createTracker(editedTracker, with: trackerCategory, isNew: false)
+            } else {
+                delegate?.createTracker(makeTracker(), with: trackerCategory, isNew: true)
+                UserDefaults.standard.set(trackerStore.trackers.count, forKey: "trackers count")
+            }
             dismiss(animated: true, completion: nil)
         }
     }
-    
+    private func editTracker() -> Tracker? {
+        guard let tracker else { return nil }
+        let monday = trackerWeekShedule[0].isOn ? WeekDay.monday : nil
+        let tuesday = trackerWeekShedule[1].isOn ? WeekDay.tuesday : nil
+        let wednesday = trackerWeekShedule[2].isOn ? WeekDay.wednesday : nil
+        let thursday = trackerWeekShedule[3].isOn ? WeekDay.thursday : nil
+        let friday = trackerWeekShedule[4].isOn ? WeekDay.friday : nil
+        let saturday = trackerWeekShedule[5].isOn ? WeekDay.saturday : nil
+        let sunday = trackerWeekShedule[6].isOn ? WeekDay.sunday : nil
+        let optionalWeekDays: [WeekDay?] = [
+            monday,
+            tuesday,
+            wednesday,
+            thursday,
+            friday,
+            saturday,
+            sunday
+        ]
+        let weekDays = optionalWeekDays.compactMap{
+            $0
+        }
+        
+        let id = tracker.id
+        let name = trackerTitle
+        let color = trackerColor
+        let emoji = trackerEmoji
+        return Tracker(
+            id: id,
+            name: name ?? "",
+            color: color,
+            emoji: emoji ?? "",
+            weekDays: weekDays
+        )
+    }
     private func makeTracker() -> Tracker {
         let monday = trackerWeekShedule[0].isOn ? WeekDay.monday : nil
         let tuesday = trackerWeekShedule[1].isOn ? WeekDay.tuesday : nil
@@ -297,7 +483,15 @@ final class NewTrackerViewController: UIViewController {
         let weekDays = optionalWeekDays.compactMap{
             $0
         }
-        NewTrackerViewController.trackerId = trackerStore.countFetch() + 1
+        if UserDefaults.standard.object(forKey: "id") != nil {
+            let idNumber = UserDefaults.standard.integer(forKey: "id")
+            NewTrackerViewController.trackerId = UInt(idNumber + 1)
+            UserDefaults.standard.set(idNumber + 1, forKey: "id")
+        } else {
+            NewTrackerViewController.trackerId = 1
+            UserDefaults.standard.set(1, forKey: "id")
+        }
+//        NewTrackerViewController.trackerId = trackerStore.countFetch() + 1
         print("id нового трекера: \(NewTrackerViewController.trackerId)")
         return Tracker(
             id: NewTrackerViewController.trackerId,
@@ -390,7 +584,12 @@ extension NewTrackerViewController: UICollectionViewDataSource {
                 if !trackerWeekShedule.isEmpty {
                     cell.configure(title: items[indexPath.row], subtitle: configSheduleCell())
                 } else {
-                    cell.configure(title: items[indexPath.row], subtitle: nil)
+                    if tracker != nil {
+                        trackerTitle = tracker?.name
+                        cell.configure(title: items[indexPath.row], subtitle: restoreShedule())
+                    } else {
+                        cell.configure(title: items[indexPath.row], subtitle: nil)
+                    }
                 }
                 checkFieldsToUpdateCreateButton()
             default:
@@ -423,6 +622,51 @@ extension NewTrackerViewController: UICollectionViewDataSource {
         }
     }
     
+    func restoreShedule() -> String {
+        guard let tracker else { return "" }
+        let weekDays = tracker.weekDays
+        
+        trackerWeekShedule.append(WeekShedule(title: NSLocalizedString("monday", comment: ""), isOn: false))
+        trackerWeekShedule.append(WeekShedule(title: NSLocalizedString("tuesday", comment: ""), isOn: false))
+        trackerWeekShedule.append(WeekShedule(title: NSLocalizedString("wednesday", comment: ""), isOn: false))
+        trackerWeekShedule.append(WeekShedule(title: NSLocalizedString("thursday", comment: ""), isOn: false))
+        trackerWeekShedule.append(WeekShedule(title: NSLocalizedString("friday", comment: ""), isOn: false))
+        trackerWeekShedule.append(WeekShedule(title: NSLocalizedString("saturday", comment: ""), isOn: false))
+        trackerWeekShedule.append(WeekShedule(title: NSLocalizedString("sunday", comment: ""), isOn: false))
+        
+        var days: [String] = Array(repeating: "", count: weekDays.count)
+        for (index, day) in weekDays.enumerated() {
+            if day == .monday/*"Понедельник"*/ {
+                days[index] = NSLocalizedString("mo", comment: "")
+                trackerWeekShedule[0].isOn = true
+            } else if day == .tuesday {
+                days[index] = NSLocalizedString("tu", comment: "")
+                trackerWeekShedule[1].isOn = true
+            } else if day == .wednesday {
+                days[index] = NSLocalizedString("we", comment: "")
+                trackerWeekShedule[2].isOn = true
+            } else if day == .thursday {
+                days[index] = NSLocalizedString("th", comment: "")
+                trackerWeekShedule[3].isOn = true
+            } else if day == .friday {
+                days[index] = NSLocalizedString("fr", comment: "")
+                trackerWeekShedule[4].isOn = true
+            } else if day == .saturday {
+                days[index] = NSLocalizedString("sa", comment: "")
+                trackerWeekShedule[5].isOn = true
+            } else if day == .sunday {
+                days[index] = NSLocalizedString("su", comment: "")
+                trackerWeekShedule[6].isOn = true
+            }
+        }
+        
+        if weekDays.count == 7 {
+            return NSLocalizedString("every day", comment: "")
+        }
+        
+        let result = days.map { $0 }.joined(separator: ", ")
+        return result
+    }
     func configSheduleCell() -> String {
         var days = trackerWeekShedule.compactMap {
             $0.isOn ? $0.title : nil
@@ -430,25 +674,25 @@ extension NewTrackerViewController: UICollectionViewDataSource {
         
         var allDays = 0
         for (index, day) in days.enumerated() {
-            if day == "Понедельник" {
-                days[index] = "Пн"
-            } else if day == "Вторник" {
-                days[index] = "Вт"
-            } else if day == "Среда" {
-                days[index] = "Ср"
-            } else if day == "Четверг" {
-                days[index] = "Чт"
-            } else if day == "Пятница" {
-                days[index] = "Пт"
-            } else if day == "Суббота" {
-                days[index] = "Сб"
-            } else if day == "Воскресенье" {
-                days[index] = "Вс"
+            if day == NSLocalizedString("monday", comment: "")/*"Понедельник"*/ {
+                days[index] = NSLocalizedString("mo", comment: "")
+            } else if day == NSLocalizedString("tuesday", comment: "") {
+                days[index] = NSLocalizedString("tu", comment: "")
+            } else if day == NSLocalizedString("wednesday", comment: "") {
+                days[index] = NSLocalizedString("we", comment: "")
+            } else if day == NSLocalizedString("thursday", comment: "") {
+                days[index] = NSLocalizedString("th", comment: "")
+            } else if day == NSLocalizedString("friday", comment: "") {
+                days[index] = NSLocalizedString("fr", comment: "")
+            } else if day == NSLocalizedString("saturday", comment: "") {
+                days[index] = NSLocalizedString("sa", comment: "")
+            } else if day == NSLocalizedString("sunday", comment: "") {
+                days[index] = NSLocalizedString("su", comment: "")
             }
             allDays += 1
         }
         if allDays == trackerWeekShedule.count {
-            return "Каждый день"
+            return NSLocalizedString("every day", comment: "")
         }
         
         let result = days.map { $0 }.joined(separator: ", ")
@@ -480,7 +724,7 @@ extension NewTrackerViewController: UICollectionViewDataSource {
             guard let view else {
                 return UICollectionReusableView()
             }
-            view.titleLabel.text = "Emoji"
+            view.titleLabel.text = NSLocalizedString("emoji", comment: "")//"Emoji"
             return view
         case self.colorCollectionView:
             var id: String
@@ -501,7 +745,7 @@ extension NewTrackerViewController: UICollectionViewDataSource {
             guard let view else {
                 return UICollectionReusableView()
             }
-            view.titleLabel.text = "Цвет"
+            view.titleLabel.text = NSLocalizedString("color", comment: "")//"Цвет"
             return view
         default:
             return UICollectionReusableView()

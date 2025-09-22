@@ -10,7 +10,7 @@ final class LeftViewController: UIViewController {
     
     private lazy var label: UILabel = {
         let label = UILabel()
-        label.text = "Отслеживайте только то, что хотите"
+        label.text = NSLocalizedString("track only what you want", comment: "")//"Отслеживайте только то, что хотите"
         label.textColor = UIColor(resource: .ypBlack)
         label.font = UIFont.systemFont(ofSize: 32, weight: .bold)
         label.numberOfLines = 0

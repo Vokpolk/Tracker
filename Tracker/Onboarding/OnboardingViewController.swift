@@ -28,7 +28,7 @@ final class OnboardingViewController: UIPageViewController {
     
     private lazy var button: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Вот это технологии!", for: .normal)
+        button.setTitle(NSLocalizedString("these are the technologies", comment: ""), for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.backgroundColor = UIColor(resource: .ypBlack)
         button.setTitleColor(.ypWhite, for: .normal)
@@ -91,7 +91,6 @@ final class OnboardingViewController: UIPageViewController {
 
 // MARK: - UIPageViewControllerDataSource
 // Пролистывание экранов
-
 extension OnboardingViewController: UIPageViewControllerDataSource {
     func pageViewController(
         _ pageViewController: UIPageViewController,
@@ -130,7 +129,6 @@ extension OnboardingViewController: UIPageViewControllerDataSource {
 
 // MARK: - UIPageViewControllerDelegate
 // Добавляем делегат и переключаем индикатор текущей страницы
-
 extension OnboardingViewController: UIPageViewControllerDelegate {
     func pageViewController(
         _ pageViewController: UIPageViewController,

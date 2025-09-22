@@ -53,6 +53,52 @@ final class TrackerStore: NSObject {
         
         saveContext()
     }
+    
+    func deleteTracker(with id: Int32) {
+        let fetchRequest = TrackerCoreData.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "id == %d", id as CVarArg)
+        fetchRequest.fetchLimit = 1
+        do {
+            let results = try context.fetch(fetchRequest)
+            if let itemToDelete = results.first {
+                context.delete(itemToDelete)
+                saveContext()
+            }
+        } catch {
+            print("Ошибка при удалении категории!")
+        }
+    }
+    
+    func updateTracker(_ tracker: Tracker, to categoryName: String) throws {
+        let fetchRequest = TrackerCoreData.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "id == %d", tracker.id as CVarArg)
+        
+        do {
+            let results = try context.fetch(fetchRequest)
+            if let objectToUpdate = results.first {
+                objectToUpdate.name = tracker.name
+                objectToUpdate.emoji = tracker.emoji
+                objectToUpdate.weekDays = WeekBitmask.daysToMask(tracker.weekDays)
+                objectToUpdate.color = tracker.color
+                
+                if let oldCategory = objectToUpdate.category {
+                    oldCategory.removeFromTrackers(objectToUpdate)
+                }
+                
+                let categoryRequest = TrackerCategoryCoreData.fetchRequest()
+                categoryRequest.predicate = NSPredicate(format: "title == %@", categoryName)
+                categoryRequest.fetchLimit = 1
+                if let newCategory = try context.fetch(categoryRequest).first {
+                    newCategory.addToTrackers(objectToUpdate)
+                }
+                
+                try context.save()
+                print("Данные успешно обновлены")
+            }
+        } catch {
+            print("Ошибка обновления")
+        }
+    }
 
     var trackers: [Tracker] {
         guard let trackers = fetchedResultsController.fetchedObjects else { return [] }
