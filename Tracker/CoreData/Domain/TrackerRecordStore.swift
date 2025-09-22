@@ -68,29 +68,6 @@ final class TrackerRecordStore: NSObject {
         
     }
     
-//    func removeTrackersRecord(_ id: UInt) {
-//        let request = NSFetchRequest<TrackerRecordCoreData>(entityName: "TrackerRecordCoreData")
-//        request.returnsObjectsAsFaults = false
-//        request.predicate = NSPredicate(
-//            format: "id == %ld",
-//            Int32(id)
-//        )
-//
-//        do {
-//            let trackers = try context.fetch(request)
-//            for tracker in trackers {
-//                let trackerId = tracker.objectID
-//                
-//                let object = try context.existingObject(with: trackerId)
-//                context.delete(object)
-//                saveContext()
-//            }
-//        } catch {
-//            print("Error id object: \(error)")
-//        }
-//        
-//    }
-    
     var trackerRecords: [TrackerRecord] {
         guard let trackerRecords = fetchedResultsController.fetchedObjects else { return [] }
         var result: [TrackerRecord] = []

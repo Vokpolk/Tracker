@@ -73,20 +73,6 @@ final class TrackerStore: NSObject {
         let fetchRequest = TrackerCoreData.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "id == %d", tracker.id as CVarArg)
         
-        
-        
-        
-        
-//        var categoryCD: TrackerCategoryCoreData?
-//        if let category = try context.fetch(categoryRequest).first {
-//            categoryCD = category
-//        } else {
-//            categoryCD = TrackerCategoryCoreData(context: context)
-//            categoryCD?.title = categoryName
-//        }
-//        let trackerCoreData = TrackerCoreData(context: context)
-//        trackerCoreData.category = categoryCD
-        
         do {
             let results = try context.fetch(fetchRequest)
             if let objectToUpdate = results.first {
@@ -112,8 +98,6 @@ final class TrackerStore: NSObject {
         } catch {
             print("Ошибка обновления")
         }
-        
-        
     }
 
     var trackers: [Tracker] {

@@ -42,7 +42,6 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             trackerCategoryStore: trackerCategoryStore
         )
         tabBarController.tabBar.isTranslucent = false
-//        tabBarController.tabBar.backgroundColor = UIColor(resource: .ypWhite)
         
         tabBarController.view.alpha = 0
         UIView.transition(

@@ -1,96 +1,54 @@
 import AppMetricaCore
 
+enum AppMetricaEvent {
+    enum Event: String {
+        case open, close, click
+    }
+    
+    enum Screen: String {
+        case main = "Main"
+        case onboarding = "Onboarding"
+        case statistics = "Statisctics"
+        case filter = "Filter"
+        //etc
+    }
+    
+    enum Item: String {
+        case addTrack = "add_track"
+        case track = "track"
+        case filter = "filter"
+        case edit = "edit"
+        case delete = "delete"
+        case none = ""
+    }
+    
+    struct Payload {
+        let event: Event
+        let screen: Screen
+        let item: Item?
+        
+        var parameters: [String: String] {
+            var dict: [String: String] = [
+                "event": event.rawValue,
+                "screen": screen.rawValue
+            ]
+            if let item, item != .none {
+                dict["item"] = item.rawValue
+            }
+            return dict
+        }
+    }
+}
+
 final class AppMetricaManager {
     static let shared = AppMetricaManager()
-    
     private init() {}
     
-    func reportScreenOpen(screen: String) {
-        let parameters: [String: Any] = [
-            "event": "open",
-            "screen": screen
-        ]
-        
-        AppMetrica.reportEvent(name: "event", parameters: parameters, onFailure: { error in
-            print("REPORT ERROR: %@", error.localizedDescription)
-        })
+    func report(_ payload: AppMetricaEvent.Payload) {
+        AppMetrica.reportEvent(
+            name: "event",
+            parameters: payload.parameters) { error in
+                print("REPORT ERROR: %@", error.localizedDescription)
+            }
     }
-    
-    func reportScreenClose(screen: String) {
-        
-        let parameters: [String: Any] = [
-            "event": "close",
-            "screen": screen
-        ]
-        
-        AppMetrica.reportEvent(name: "event", parameters: parameters, onFailure: { error in
-            print("REPORT ERROR: %@", error.localizedDescription)
-        })
-    }
-    
-    func reportAddTrack(screen: String) {
-        
-        let parameters: [String: Any] = [
-            "event": "click",
-            "screen": screen,
-            "item": "add_track"
-        ]
-        
-        AppMetrica.reportEvent(name: "event", parameters: parameters, onFailure: { error in
-            print("REPORT ERROR: %@", error.localizedDescription)
-        })
-    }
-    
-    func reportTrack(screen: String) {
-        
-        let parameters: [String: Any] = [
-            "event": "click",
-            "screen": screen,
-            "item": "track"
-        ]
-        
-        AppMetrica.reportEvent(name: "event", parameters: parameters, onFailure: { error in
-            print("REPORT ERROR: %@", error.localizedDescription)
-        })
-    }
-    
-    func reportFilter(screen: String) {
-        
-        let parameters: [String: Any] = [
-            "event": "click",
-            "screen": screen,
-            "item": "filter"
-        ]
-        
-        AppMetrica.reportEvent(name: "event", parameters: parameters, onFailure: { error in
-            print("REPORT ERROR: %@", error.localizedDescription)
-        })
-    }
-    
-    func reportEdit(screen: String) {
-        
-        let parameters: [String: Any] = [
-            "event": "click",
-            "screen": screen,
-            "item": "edit"
-        ]
-        
-        AppMetrica.reportEvent(name: "event", parameters: parameters, onFailure: { error in
-            print("REPORT ERROR: %@", error.localizedDescription)
-        })
-    }
-    
-    func reportDelete(screen: String) {
-        
-        let parameters: [String: Any] = [
-            "event": "click",
-            "screen": screen,
-            "item": "delete"
-        ]
-        
-        AppMetrica.reportEvent(name: "event", parameters: parameters, onFailure: { error in
-            print("REPORT ERROR: %@", error.localizedDescription)
-        })
-    }
-    
 }

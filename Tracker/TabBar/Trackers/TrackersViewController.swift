@@ -195,8 +195,8 @@ final class TrackersViewController: UIViewController {
         let newTrackerViewController = NewTrackerViewController(trackerStore: trackerStore)
         newTrackerViewController.delegate = self
         newTrackerViewController.configureHabit()
-//        report(event: )
-        AppMetricaManager.shared.reportAddTrack(screen: "Main")
+
+        AppMetricaManager.shared.report(.init(event: .click, screen: .main, item: .addTrack))
         present(newTrackerViewController, animated: true)
     }
     
@@ -244,7 +244,8 @@ final class TrackersViewController: UIViewController {
         if let filterName = UserDefaults.standard.string(forKey: PickedFilter.filter) {
             filterVC.initFilter(filterName)
             filterVC.delegate = self
-            AppMetricaManager.shared.reportFilter(screen: "Main")
+            
+            AppMetricaManager.shared.report(.init(event: .click, screen: .main, item: .filter))
             present(filterVC, animated: true)
         }
     }
@@ -500,8 +501,7 @@ extension TrackersViewController: TrackerCellDelegate {
         
         UserDefaults.standard.set(trackerRecordStore.trackerRecords.count, forKey: "completed trackers")
         
-        
-        AppMetricaManager.shared.reportTrack(screen: "Main")
+        AppMetricaManager.shared.report(.init(event: .click, screen: .main, item: .track))
     }
     
     func uncompleteTracker(id: UInt, at indexPath: IndexPath) {
@@ -599,7 +599,7 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout, UICollecti
                         visibleCategories[indexPath.section].title
                     )
                     
-                    AppMetricaManager.shared.reportEdit(screen: "Main")
+                    AppMetricaManager.shared.report(.init(event: .click, screen: .main, item: .edit))
                     present(vc, animated: true)
                 },
                 UIAction(
@@ -614,7 +614,8 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout, UICollecti
                     UserDefaults.standard.set(trackerStore.trackers.count, forKey: "trackers count")
                     UserDefaults.standard.set(completedTrackers.count, forKey: "completed trackers")
                     dateChanged()
-                    AppMetricaManager.shared.reportDelete(screen: "Main")
+                    
+                    AppMetricaManager.shared.report(.init(event: .click, screen: .main, item: .delete))
                 },
             ])
         })

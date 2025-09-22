@@ -91,7 +91,6 @@ final class OnboardingViewController: UIPageViewController {
 
 // MARK: - UIPageViewControllerDataSource
 // Пролистывание экранов
-
 extension OnboardingViewController: UIPageViewControllerDataSource {
     func pageViewController(
         _ pageViewController: UIPageViewController,
@@ -130,7 +129,6 @@ extension OnboardingViewController: UIPageViewControllerDataSource {
 
 // MARK: - UIPageViewControllerDelegate
 // Добавляем делегат и переключаем индикатор текущей страницы
-
 extension OnboardingViewController: UIPageViewControllerDelegate {
     func pageViewController(
         _ pageViewController: UIPageViewController,

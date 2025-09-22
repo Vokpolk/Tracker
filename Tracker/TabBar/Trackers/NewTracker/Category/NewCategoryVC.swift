@@ -8,7 +8,6 @@ final class NewCategoryViewController: UIViewController {
     
     private lazy var categoryLabel: UILabel = {
         let label = UILabel()
-//        label.text = "Новая категория"
         label.text = NSLocalizedString("new category", comment: "")
         label.textColor = UIColor(resource: .ypBlack)
         label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
@@ -18,7 +17,6 @@ final class NewCategoryViewController: UIViewController {
     
     private lazy var enterCategoryName: UITextField = {
         let enterTrackerName = UITextField()
-//        enterTrackerName.placeholder = "Введите название категории"
         enterTrackerName.placeholder = NSLocalizedString("input category name", comment: "")
         enterTrackerName.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 16, height: enterTrackerName.frame.height))
         enterTrackerName.leftViewMode = .always
@@ -45,7 +43,6 @@ final class NewCategoryViewController: UIViewController {
     
     private lazy var addCategoryButton: UIButton = {
         let button = UIButton(type: .system)
-//        button.setTitle("Готово", for: .normal)
         button.setTitle(NSLocalizedString("ready", comment: ""), for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.backgroundColor = UIColor(resource: .ypGray)
@@ -62,7 +59,6 @@ final class NewCategoryViewController: UIViewController {
     
     private lazy var isExistsLabel: UILabel = {
         let label = UILabel()
-//        label.text = "Категория существует!"//category exists
         label.text = NSLocalizedString("category exists", comment: "")
         label.textColor = UIColor(resource: .ypRed)
         label.font = UIFont.systemFont(ofSize: 16, weight: .medium)

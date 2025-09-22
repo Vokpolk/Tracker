@@ -53,7 +53,6 @@ final class CategoryViewController: UIViewController {
     
     private lazy var label: UILabel = {
         let label = UILabel()
-//        label.text = "Привычки и события можно\nобъединить по смыслу"
         label.text = NSLocalizedString("habits and events can be combined in meaning", comment: "")
         label.textColor = UIColor(resource: .ypBlack)
         label.font = UIFont.systemFont(ofSize: 12, weight: .medium)
@@ -64,7 +63,6 @@ final class CategoryViewController: UIViewController {
     
     private lazy var addCategoryButton: UIButton = {
         let button = UIButton(type: .system)
-//        button.setTitle("Добавить категорию", for: .normal)
         button.setTitle(NSLocalizedString("add category", comment: ""), for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.backgroundColor = UIColor(resource: .ypBlack)
@@ -140,7 +138,6 @@ final class CategoryViewController: UIViewController {
             collectionView.topAnchor.constraint(equalTo: categoryLabel.bottomAnchor, constant: 30),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant:  -16),
-//            collectionView.bottomAnchor.constraint(equalTo: collectionView.topAnchor, constant: CGFloat(cellHeight * categories.count) - 1),
                 
             placeholderImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             placeholderImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -50),
